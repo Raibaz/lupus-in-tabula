@@ -238,11 +238,26 @@ public class GameEngine {
 		return computeDeadPlayerInRound2();
 	}
 	
+	public boolean hasGameEnded() {
+		int countOfAliveWolves = 0;
+		int countOfAliveCitizens = 0;
+		for(Player p : g.getPlayers()) {
+			if(p.isAlive()) {
+				if(p.getRole() == PlayerRole.WOLF) {
+					countOfAliveWolves++;
+				} else {
+					countOfAliveCitizens++;
+				}
+			}
+		}
+		return countOfAliveWolves == 0 || countOfAliveWolves >= countOfAliveCitizens -1;
+	}
+	
 	public void resetVotes() {
 		LupusDAO dao = new LupusDAO();
 		for(Player p : g.getPlayers(true)) {			
 			p.setVotes(0);
-			p.setHasVoted(false);
+			p.setHasVoted(false);			
 			dao.ofy().put(p);						
 		}
 		g.refreshPlayers();
