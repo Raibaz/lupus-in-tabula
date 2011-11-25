@@ -81,6 +81,7 @@ public class VoteServlet extends HttpServlet {
 					deadPlayer.setAlive(false);
 					dao.ofy().put(deadPlayer);				
 					engine.resetVotes();
+																
 					LupusMessage stateMsg = new LupusMessage(MessageType.GAMESTATE, voter);
 					stateMsg.setTarget(deadPlayer);
 					stateMsg.setMsg(GameState.NIGHT.toString());
@@ -92,7 +93,16 @@ public class VoteServlet extends HttpServlet {
 					LupusMessage wolfMessage = new LupusMessage(MessageType.NIGHTVOTE, null);
 					wolfMessage.setMsg(PlayerRole.WOLF.toString());
 					wolfMessage.setNext(engine.determineNextVoterInNight(null));					
-					wolfMessage.broadcastToPlayersByRole(g, PlayerRole.WOLF);
+					wolfMessage.broadcastToPlayersByRole(g, PlayerRole.WOLF);	
+															
+					if(engine.hasGameEnded()) {
+						g.setState(GameState.ENDED);
+						LupusMessage endMsg = new LupusMessage(MessageType.GAMESTATE, voter);
+						endMsg.setMsg(deadPlayer.getRole().toString());
+						endMsg.broadcastToPlayingPlayers(g);
+						
+					} 					
+									
 				}
 			} else if(g.getState() == GameState.NIGHT) {								
 				Player deadPlayer = engine.computeDeadPlayerInNight();

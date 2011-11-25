@@ -73,7 +73,7 @@ public class Game extends AbsJsonable {
 	}
 	
 	public List<Player> getPlayers() {
-		return players;
+		return getPlayers(false);
 	}
 	
 	public List<Player> getPlayers(boolean load) {
