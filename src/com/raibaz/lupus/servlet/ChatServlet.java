@@ -26,11 +26,12 @@ public class ChatServlet extends HttpServlet {
 				
 		Game g = dao.ofy().get(Game.class, gameId);
 		Player p = dao.ofy().get(Player.class, playerId);
+		if(!p.isAlive()) {
+			return;
+		}
 		
 		LupusMessage message = new LupusMessage(MessageType.CHAT, p);
 		message.setMsg(msg);
-		message.broadcastToPlayingPlayers(g);
-		
-		resp.getWriter().write("ok");		
+		message.broadcastToPlayingPlayers(g);					
 	}
 }
