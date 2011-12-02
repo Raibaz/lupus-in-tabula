@@ -26,6 +26,11 @@
 	float: left;	
 }
 
+#chat-log {
+	height: 100%;
+	overflow: scroll;
+}
+
 #chat-form {
 	width: 100%;
 }

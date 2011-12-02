@@ -4,8 +4,8 @@
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 		<script type="text/javascript" src="js/jquery.blockUI.js"></script>
 		<script type="text/javascript" src="/_ah/channel/jsapi"></script>		
-		<script type="text/javascript" src="js/util.js"></script>
-		<link href="/style.css" rel="stylesheet" type="text/css"/> 
+		<script type="text/javascript" src="js/util.js?ver=1"></script>
+		<link href="/style.css?ver=1" rel="stylesheet" type="text/css"/> 
 	</head>
 	<body>
 		<div id="play-main">
@@ -37,6 +37,7 @@
 					}
 					
 					$('.player-item').click(function() {
+						$('#players').block();
 						if(current_state === 'VOTING_1') {							
 							$.post('/vote', {"target_id": this.id, "game_id": "<%=request.getParameter("game_id")%>", "voter_id":"<%=request.getParameter("player_id")%>"});
 						}
@@ -83,6 +84,7 @@
 								chat('', "Inizia il primo round di nomination, il primo a votare è " + data.target.name);
 								if(<%=request.getParameter("player_id")%> == data.target.fbId) {
 									$('#players').unblock();
+									$('#' + data.target.fbId).block();
 								} else {
 									$('#players').block();
 								}
@@ -109,6 +111,9 @@
 							} else if(data.msg == "DEBATE") {
 								chat('', "E' giorno, e " + data.target.name + " è morto.");
 								$('#players').unblock();
+							} else if(data.msg == "ENDED") {
+								$('#players').block();
+								chat('', "Il gioco è finito.");
 							}
 						} else if(data.type == "VOTE") {
 							chat(data.player.name, "ha votato per <b>" + data.target.name + "</b>");	

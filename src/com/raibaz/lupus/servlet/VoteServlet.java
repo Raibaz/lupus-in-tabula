@@ -98,9 +98,8 @@ public class VoteServlet extends HttpServlet {
 					if(engine.hasGameEnded()) {
 						g.setState(GameState.ENDED);
 						LupusMessage endMsg = new LupusMessage(MessageType.GAMESTATE, voter);
-						endMsg.setMsg(deadPlayer.getRole().toString());
-						endMsg.broadcastToPlayingPlayers(g);
-						
+						endMsg.setMsg(GameState.ENDED.toString());
+						endMsg.broadcastToPlayingPlayers(g);						
 					} 					
 									
 				}

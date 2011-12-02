@@ -250,7 +250,7 @@ public class GameEngine {
 				}
 			}
 		}
-		return countOfAliveWolves == 0 || countOfAliveWolves >= countOfAliveCitizens -1;
+		return countOfAliveWolves == 0 || countOfAliveWolves >= countOfAliveCitizens;
 	}
 	
 	public void resetVotes() {
