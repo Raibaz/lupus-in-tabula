@@ -18,6 +18,7 @@ public abstract class BaseTest {
 	protected Player silvia = new Player();
 	protected Player gianluca = new Player();
 	protected Player mighel = new Player();
+	protected Player fanopio = new Player();
 	protected GameEngine engine;
 	protected LupusDAO dao = new LupusDAO();
 	
@@ -33,6 +34,8 @@ public abstract class BaseTest {
 		gianluca.setName("Gianluca Fanuppi");
 		mighel.setFbId("423343421231");
 		mighel.setName("Mighel Dannopoli");
+		fanopio.setFbId("432432423423");
+		fanopio.setName("Fanopio fennatsi");
 		g = new Game();
 		g.setOwner(raibaz);
 		g.setId(raibaz.getFbId() + "-" + new Date());

@@ -81,9 +81,9 @@ public class GameEngineTest extends BaseTest {
 		Assert.assertEquals(nominated.get(1).getName(), mattia.getName());
 		
 		engine.resetVotes();
-//		Assert.assertEquals(raibaz.isNominated(), true);
-//		Assert.assertEquals(mattia.isNominated(), true);
-//		Assert.assertEquals(silvia.isNominated(), false);
+		raibaz = g.getPlayer(raibaz.getFbId());
+		mattia = g.getPlayer(mattia.getFbId());
+		silvia = g.getPlayer(silvia.getFbId());
 		Assert.assertEquals(raibaz.getVotes(), 0);
 		Assert.assertEquals(mattia.getVotes(), 0);
 		Assert.assertEquals(silvia.getVotes(), 0);
@@ -116,12 +116,14 @@ public class GameEngineTest extends BaseTest {
 		Assert.assertNotNull(firstWolf);
 		
 		firstWolf.setHasVoted(true);
+		dao.ofy().put(firstWolf);
 		raibaz.setVotes(raibaz.getVotes()+1);
 		
 		Player nextWolf = engine.determineNextVoterInNight(firstWolf);
 		Assert.assertNotNull(nextWolf);
 		
 		nextWolf.setHasVoted(true);
+		dao.ofy().put(nextWolf);
 		raibaz.setVotes(raibaz.getVotes()+1);
 		
 		nextWolf = engine.determineNextVoterInNight(nextWolf);
@@ -145,4 +147,24 @@ public class GameEngineTest extends BaseTest {
 			Assert.assertNotNull(p.getRole());
 		}
 	}
+	
+	@Test
+	public void testEndGame() {
+		g.getPlayers().add(gianluca);
+		g.getPlayers().add(mighel);
+		g.getPlayers().add(fanopio);
+		
+		engine.updateGame(g);
+		engine.assignRoles();
+		engine.resetVotes();
+				
+		Assert.assertFalse(engine.hasGameEnded());
+		
+		fanopio.setAlive(false);
+		dao.ofy().put(fanopio);
+		g.refreshPlayers();
+		
+		Assert.assertTrue(engine.hasGameEnded());
+	}
+	
 }

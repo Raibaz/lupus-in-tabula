@@ -49,7 +49,7 @@
 					} else if(data.type == "GAMESTATE" && data.msg.indexOf("start__") == 0) {																			
 						url = "/play.jsp?player_id=" + data.target.fbId + "&game_id=" + data.gameId + '&channel_token=' + data.msg.substring("start__".length);
 						console.info(url);
-						channel.close();
+						socket.close();
 						location.replace(url);						
 					}
 				};	

@@ -54,8 +54,21 @@ public class BeginServlet extends HttpServlet {
 				resp.sendRedirect("/index.jsp?player_name=" + p.getName() + "&player_avatar=" + p.getPictureUrl() + "&player_id=" + p.getFbId());
 			}
 		} else {
-			log.info("Request from fb without signed_request!");			
-			resp.sendRedirect("/index.jsp");
+			log.info("Request from fb without signed_request!");
+			if(req.getParameter("player_id") != null && req.getParameter("player_name") != null) {
+				String fbId = req.getParameter("player_id");
+				Player p = dao.getPlayer(fbId);
+				if(p == null) {
+					p = new Player();
+					p.setFbId(fbId);
+					p.setName(req.getParameter("player_name"));
+					p.setPictureUrl(req.getParameter("player_avatar"));
+					dao.ofy().put(p);
+				}
+				resp.sendRedirect("/index.jsp?player_name=" + p.getName() + "&player_avatar=" + p.getPictureUrl() + "&player_id=" + p.getFbId());				
+			} else {
+				resp.sendRedirect("/index.jsp");
+			}
 		}				
 	}
 }
