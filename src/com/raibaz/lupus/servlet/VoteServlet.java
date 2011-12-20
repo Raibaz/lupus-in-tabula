@@ -36,8 +36,7 @@ public class VoteServlet extends HttpServlet {
 		Game g = dao.ofy().get(Game.class, gameId);		
 		Player voter = g.getPlayer(voterId);		
 		Player target = g.getPlayer(targetId);
-		
-		
+								
 		voter.setHasVoted(true);
 		dao.ofy().put(voter);
 		target.setVotes(target.getVotes()+1);
@@ -50,7 +49,46 @@ public class VoteServlet extends HttpServlet {
 		} else if(g.getState() == GameState.VOTING_2) {
 			nextVoter = engine.determineNextVoterInRound2(voter);
 		} else if(g.getState() == GameState.NIGHT) {
+			if(voter.getRole() == PlayerRole.SEER) {
+				LupusMessage seerMessage = new LupusMessage(MessageType.NIGHTINFO, voter);
+				seerMessage.setTarget(target);
+				seerMessage.setMsg("" + target.getRole().isWolf());
+				seerMessage.broadcastToPlayersByRole(g, PlayerRole.SEER);				
+			} else if(voter.getRole() == PlayerRole.BODYGUARD) {
+				target.setBodyguarded(true);
+				LupusMessage seerMessage = new LupusMessage(MessageType.NIGHTINFO, voter);
+				seerMessage.setTarget(target);				
+				seerMessage.broadcastToPlayersByRole(g, PlayerRole.BODYGUARD);
+			} else if(voter.getRole() == PlayerRole.OWL) {
+				target.setOwled(true);
+				LupusMessage seerMessage = new LupusMessage(MessageType.NIGHTINFO, voter);
+				seerMessage.setTarget(target);				
+				seerMessage.broadcastToPlayersByRole(g, PlayerRole.OWL);
+			}
+			
 			nextVoter = engine.determineNextVoterInNight(voter);
+			if(nextVoter != null) {
+				notifyNextCharacter(g, nextVoter);
+				//Il medium non vota
+				if(nextVoter.getRole() == PlayerRole.MEDIUM) {
+					LupusMessage mediumMessage = new LupusMessage(MessageType.NIGHTINFO, null);
+					mediumMessage.setTarget(g.getLastDead());
+					mediumMessage.setMsg("" + g.getLastDead().getRole().isWolf());
+					mediumMessage.broadcastToPlayersByRole(g, nextVoter.getRole());
+					nextVoter = engine.determineNextVoterInNight(nextVoter);
+					if(nextVoter != null) {
+						notifyNextCharacter(g, nextVoter);
+					} else {
+						handleVotesFinished(g, voter);
+						dao.ofy().put(g);
+						return;
+					}
+				}
+				dao.ofy().put(g);												
+				if(nextVoter.getRole() != PlayerRole.WOLF) {
+					return;
+				}
+			}
 		}
 		
 		LupusMessage msg = new LupusMessage(MessageType.VOTE, voter);
@@ -65,65 +103,81 @@ public class VoteServlet extends HttpServlet {
 				
 		if(nextVoter == null) {
 			//Votazioni terminate
-			if(g.getState() == GameState.VOTING_1) {
-				g.setState(GameState.VOTING_2);
-				ArrayList<Player> votedPlayers = engine.computeVotedIdsInRound1();
-				engine.resetVotes();
-				LupusMessage stateMsg = new LupusMessage(MessageType.GAMESTATE, voter);
-				stateMsg.setMsg(GameState.VOTING_2.toString());
-				stateMsg.setNominated(votedPlayers);				
-				stateMsg.setTarget(engine.determineNextVoterInRound2(g.getLastDead()));
-				stateMsg.broadcastToPlayingPlayers(g);
-			} else if(g.getState() == GameState.VOTING_2) {
-				g.setState(GameState.NIGHT);
-				Player deadPlayer = engine.computeDeadPlayerInRound2();
-				if(deadPlayer != null) {					
-					deadPlayer.setAlive(false);
-					dao.ofy().put(deadPlayer);				
-					engine.resetVotes();
-																
-					LupusMessage stateMsg = new LupusMessage(MessageType.GAMESTATE, voter);
-					stateMsg.setTarget(deadPlayer);
-					stateMsg.setMsg(GameState.NIGHT.toString());
-					if(log.isLoggable(Level.FINE)) {
-						log.fine("About to send message stating that after a vote by " + voter.getName() + ", " + deadPlayer.getName() + " died.");
-					}
-					stateMsg.broadcastToPlayingPlayers(g);
-					
-					LupusMessage wolfMessage = new LupusMessage(MessageType.NIGHTVOTE, null);
-					wolfMessage.setMsg(PlayerRole.WOLF.toString());
-					wolfMessage.setNext(engine.determineNextVoterInNight(null));					
-					wolfMessage.broadcastToPlayersByRole(g, PlayerRole.WOLF);	
-															
-					if(engine.hasGameEnded()) {
-						g.setState(GameState.ENDED);
-						LupusMessage endMsg = new LupusMessage(MessageType.GAMESTATE, voter);
-						endMsg.setMsg(GameState.ENDED.toString());
-						endMsg.broadcastToPlayingPlayers(g);						
-					} 					
-									
-				}
-			} else if(g.getState() == GameState.NIGHT) {								
-				Player deadPlayer = engine.computeDeadPlayerInNight();
-				if(deadPlayer != null) {
-					deadPlayer.setAlive(false);
-					dao.ofy().put(deadPlayer);
-					engine.resetVotes();
-					if(g.getConfiguration().hasSeer()) {
-						LupusMessage seerMessage = new LupusMessage(MessageType.NIGHTVOTE, null);
-						seerMessage.setMsg(PlayerRole.SEER.toString());
-						seerMessage.broadcastToPlayersByRole(g, PlayerRole.SEER);
-					} else {
-						LupusMessage dayMessage = new LupusMessage(MessageType.GAMESTATE, null);
-						dayMessage.setMsg(GameState.DEBATE.toString());
-						dayMessage.setTarget(deadPlayer);
-						dayMessage.broadcastToPlayingPlayers(g);
-					}
-				}
-			}
+			handleVotesFinished(g, voter);
 			
 		}
 			
 		dao.ofy().put(g);
+	}
+
+	private void notifyNextCharacter(Game g, Player nextVoter) {
+		LupusMessage stateMsg = new LupusMessage(MessageType.GAMESTATE, null);			
+		stateMsg.setMsg(nextVoter.getRole().toString());
+		stateMsg.broadcastToPlayingPlayers(g);
+		
+		if(nextVoter.getRole() != PlayerRole.MEDIUM) {
+			LupusMessage nextMsg = new LupusMessage(MessageType.NIGHTVOTE, null);
+			nextMsg.setMsg(nextVoter.getRole().toString());
+			nextMsg.setNext(nextVoter);
+			nextMsg.broadcastToPlayersByRole(g, nextVoter.getRole());
+		}
+	}
+
+	private void handleVotesFinished(Game g, Player voter) {
+		GameEngine engine = new GameEngine(g);
+		LupusDAO dao = new LupusDAO();
+		if(g.getState() == GameState.VOTING_1) {
+			g.setState(GameState.VOTING_2);
+			ArrayList<Player> votedPlayers = engine.computeVotedIdsInRound1();
+			engine.resetVotes();
+			LupusMessage stateMsg = new LupusMessage(MessageType.GAMESTATE, voter);
+			stateMsg.setMsg(GameState.VOTING_2.toString());
+			stateMsg.setNominated(votedPlayers);				
+			stateMsg.setTarget(engine.determineNextVoterInRound2(g.getLastDead()));
+			stateMsg.broadcastToPlayingPlayers(g);
+		} else if(g.getState() == GameState.VOTING_2) {
+			g.setState(GameState.NIGHT);
+			Player deadPlayer = engine.computeDeadPlayerInRound2();
+			if(deadPlayer != null) {					
+				deadPlayer.setAlive(false);
+				g.setLastDead(deadPlayer);
+				dao.ofy().put(deadPlayer);				
+				engine.resetVotes();
+															
+				LupusMessage stateMsg = new LupusMessage(MessageType.GAMESTATE, voter);
+				stateMsg.setTarget(deadPlayer);
+				stateMsg.setMsg(GameState.NIGHT.toString());
+				if(log.isLoggable(Level.FINE)) {
+					log.fine("About to send message stating that after a vote by " + voter.getName() + ", " + deadPlayer.getName() + " died.");
+				}
+				stateMsg.broadcastToPlayingPlayers(g);
+				
+				LupusMessage wolfMessage = new LupusMessage(MessageType.NIGHTVOTE, null);
+				wolfMessage.setMsg(PlayerRole.WOLF.toString());
+				wolfMessage.setNext(engine.determineNextVoterInNight(null));					
+				wolfMessage.broadcastToPlayersByRole(g, PlayerRole.WOLF);	
+														
+				if(engine.hasGameEnded()) {
+					g.setState(GameState.ENDED);
+					LupusMessage endMsg = new LupusMessage(MessageType.GAMESTATE, voter);
+					endMsg.setMsg(GameState.ENDED.toString());
+					endMsg.broadcastToPlayingPlayers(g);						
+				} 					
+								
+			}
+		} else if(g.getState() == GameState.NIGHT) {								
+			Player deadPlayer = engine.computeDeadPlayerInNight();
+			if(deadPlayer != null) {
+				deadPlayer.setAlive(false);
+				dao.ofy().put(deadPlayer);
+				g.setLastDead(deadPlayer);
+			}
+			engine.resetVotes();
+
+			LupusMessage dayMessage = new LupusMessage(MessageType.GAMESTATE, null);
+			dayMessage.setMsg(GameState.DEBATE.toString());
+			dayMessage.setTarget(deadPlayer);
+			dayMessage.broadcastToPlayingPlayers(g);				
+		}
 	}
 }

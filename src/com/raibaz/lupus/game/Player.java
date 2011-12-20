@@ -15,6 +15,8 @@ public class Player extends AbsJsonable {
 	private boolean hasVoted = false;
 	private boolean nominated = false;
 	private boolean alive = true;	
+	private boolean bodyguarded = false;
+	private boolean owled = false;
 			
 	@Override
 	public boolean equals(Object o) {
@@ -82,4 +84,16 @@ public class Player extends AbsJsonable {
 	public void setNominated(boolean nominated) {
 		this.nominated = nominated;
 	}
+	public boolean isBodyguarded() {
+		return bodyguarded;
+	}
+	public void setBodyguarded(boolean bodyguarded) {
+		this.bodyguarded = bodyguarded;
+	}
+	public boolean isOwled() {
+		return owled;
+	}
+	public void setOwled(boolean owled) {
+		this.owled = owled;
+	}	
 }

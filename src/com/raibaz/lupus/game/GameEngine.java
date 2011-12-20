@@ -181,10 +181,24 @@ public class GameEngine {
 					return p;
 				}
 			}
+			return g.getPlayerByRole(PlayerRole.SEER);
+		} else if(lastVoter.getRole() == PlayerRole.SEER) {
+			return g.getPlayerByRole(PlayerRole.MEDIUM);
+		} else if(lastVoter.getRole() == PlayerRole.MEDIUM) {
+			if(g.getConfiguration().hasBodyguard()) {
+				return g.getPlayerByRole(PlayerRole.BODYGUARD);
+			} else if(g.getConfiguration().hasOwl()) {
+				return g.getPlayerByRole(PlayerRole.OWL);
+			}
+		} else if(lastVoter.getRole() == PlayerRole.BODYGUARD) {
+			if(g.getConfiguration().hasOwl()) {
+				return g.getPlayerByRole(PlayerRole.OWL);
+			}
 		}
 		return null;
 	}
 	
+		
 	
 	public ArrayList<Player> computeVotedIdsInRound1() {
 		ArrayList<Player> ret = new ArrayList<Player>();
@@ -200,7 +214,7 @@ public class GameEngine {
 		
 		do {
 			for(Player p : players) {
-				if(p.getVotes() == maxVotes) {		
+				if(p.getVotes() == maxVotes || p.isOwled()) {		
 					log.fine("About to set nominated == true for player = " + p.getFbId());
 					p.setNominated(true);					
 					dao.ofy().put(p);
@@ -235,7 +249,12 @@ public class GameEngine {
 	}
 	
 	public Player computeDeadPlayerInNight() {
-		return computeDeadPlayerInRound2();
+		Player dead = computeDeadPlayerInRound2();
+		if(dead.isBodyguarded()) {
+			return null;
+		} else {
+			return dead;
+		}
 	}
 	
 	public boolean hasGameEnded() {
@@ -257,9 +276,11 @@ public class GameEngine {
 		LupusDAO dao = new LupusDAO();
 		for(Player p : g.getPlayers(true)) {			
 			p.setVotes(0);
-			p.setHasVoted(false);			
+			p.setHasVoted(false);
+			p.setBodyguarded(false);
+			p.setOwled(false);
 			dao.ofy().put(p);						
-		}
+		}		
 		g.refreshPlayers();
 		persistGame();
 	}

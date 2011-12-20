@@ -96,6 +96,16 @@ public class Game extends AbsJsonable {
 		}
 		return ret;
 	}
+	
+	public Player getPlayerByRole(PlayerRole role) {
+		for(Player p : getPlayers(false)) {
+			if(p.getRole() == role) {
+				return p;
+			}
+		}
+		return null;
+	}
+	
 	public void setPlayers(List<Player> players) {
 		this.players = players;
 	}

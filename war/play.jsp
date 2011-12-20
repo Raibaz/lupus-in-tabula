@@ -5,6 +5,7 @@
 		<script type="text/javascript" src="js/jquery.blockUI.js"></script>
 		<script type="text/javascript" src="/_ah/channel/jsapi"></script>		
 		<script type="text/javascript" src="js/util.js?ver=1"></script>
+		<script type="text/javascript" src="js/play.js?ver=1"></script>
 		<link href="/style.css?ver=1" rel="stylesheet" type="text/css"/> 
 	</head>
 	<body>
@@ -31,7 +32,7 @@
 			var current_state = "DEBATE";
 			$(document).ready(function() {
 				$.post('/get_game', {"game_id":"<%=request.getParameter("game_id")%>"}, function(data) {
-					resp = JSON.parse(data);
+					resp = JSON.parse(data);					
 					for(i in resp.players) {
 						$('#players-list').append('<li class="player-item" id="' + resp.players[i].fbId + '"><img src="' + resp.players[i].pictureUrl + '"/>' + resp.players[i].name + '</li>');
 					}
@@ -114,6 +115,14 @@
 							} else if(data.msg == "ENDED") {
 								$('#players').block();
 								chat('', "Il gioco è finito.");
+							} else if(data.msg == "SEER") {
+								chat('', "I lupi chiudono gli occhi.");
+								chat('', "Il veggente apre gli occhi e indica un giocatore");
+								$('#players').block();
+							} else if(data.msg == "MEDIUM") {
+								chat('', "Il veggente chiude gli occhi.");
+								chat('', "Il medium apre gli occhi e ottiene informazioni sul giocatore morto di giorno");
+								$('#players').block();
 							}
 						} else if(data.type == "VOTE") {
 							chat(data.player.name, "ha votato per <b>" + data.target.name + "</b>");	
@@ -131,6 +140,12 @@
 								$('#players').unblock();
 							} else {
 								chat('', "E' il turno di " + data.next.name + " di indicare un giocatore");
+							}
+						} else if(data.type == "NIGHTINFO") {
+							if(data.msg) {
+								chat('', data.target.name  + " è un lupo");
+							} else {
+								chat('', data.target.name  + " è un contadino");
 							}
 						}
 					};						

@@ -7,5 +7,9 @@ public enum PlayerRole {
 	INDEMONIATED,
 	BODYGUARD,
 	OWL,
-	CITIZEN
+	CITIZEN;
+	
+	public boolean isWolf() {
+		return this == WOLF;
+	}
 }
