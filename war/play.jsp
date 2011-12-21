@@ -5,7 +5,7 @@
 		<script type="text/javascript" src="js/jquery.blockUI.js"></script>
 		<script type="text/javascript" src="/_ah/channel/jsapi"></script>		
 		<script type="text/javascript" src="js/util.js?ver=1"></script>
-		<script type="text/javascript" src="js/play.js?ver=1"></script>
+		<script type="text/javascript" src="js/play.js?ver=3"></script>
 		<link href="/style.css?ver=1" rel="stylesheet" type="text/css"/> 
 	</head>
 	<body>
@@ -32,9 +32,14 @@
 			var current_state = "DEBATE";
 			$(document).ready(function() {
 				$.post('/get_game', {"game_id":"<%=request.getParameter("game_id")%>"}, function(data) {
+					myFbId = "<%=request.getParameter("player_id")%>";
 					resp = JSON.parse(data);					
 					for(i in resp.players) {
-						$('#players-list').append('<li class="player-item" id="' + resp.players[i].fbId + '"><img src="' + resp.players[i].pictureUrl + '"/>' + resp.players[i].name + '</li>');
+						$('#players-list').append('<li class="player-item" id="' + resp.players[i].fbId + '"><img src="' + resp.players[i].pictureUrl + '"/>' + resp.players[i].name + ' <span class="votes"/></li>');
+						players[resp.players[i].fbId] = new Player();
+						if(resp.players[i].fbId == "<%=request.getParameter("player_id")%>") {
+							players[resp.players[i].fbId].self = true;
+						}
 					}
 					
 					$('.player-item').click(function() {
@@ -45,7 +50,7 @@
 					});
 					
 					fadeItem = function() {
- 					   $('#players-list li:hidden:first').delay(500).fadeIn(fadeItem);
+ 					   $('#players-list li:hidden:first').delay(200).fadeIn(fadeItem);
 					}
 					fadeItem();
 					
@@ -62,6 +67,10 @@
 					});
 					
 					$('#chat-form').submit(function() {
+						if(!players[myFbId].alive) {
+							chat('', 'Non puoi parlare, sei morto.');
+							return false;
+						}
 						msg = $('#chat-text').val();
 						$.post('/chat', {"game_id": "<%=request.getParameter("game_id")%>","msg": msg, "player_id": "<%=request.getParameter("player_id")%>"});
 						$('#chat-text').val("");
@@ -73,7 +82,7 @@
 					socket.onmessage = function(message) {
 						console.info(message.data);
 						data = JSON.parse(message.data);
-						if(data.type == "CHAT") {
+						if(data.type == "CHAT") {							
 							chat(data.player.name, data.msg);							 
 						} else if(data.type == "GAMESTATE" && data.msg && data.msg.indexOf("start__") == 0) {																			
 							url = "/play.jsp?player_id=" + data.player.fbId + "&game_id=" + data.gameId + '&channel_token=' + data.msg.substring("start__".length);
@@ -85,32 +94,38 @@
 								chat('', "Inizia il primo round di nomination, il primo a votare è " + data.target.name);
 								if(<%=request.getParameter("player_id")%> == data.target.fbId) {
 									$('#players').unblock();
-									$('#' + data.target.fbId).block();
+									blockUnavailablePlayers();							
 								} else {
 									$('#players').block();
 								}
 							} else if(data.msg == "VOTING_2") {
 								$('#players').unblock();
 								var splitted = data.msg.split("|");								
-								$('.player-item').block();
-								chat('', "E' finito il primo giro di nomination");
-								for(i in data.nominated) {									
-									$('#' + data.nominated[i].fbId).unblock();
+								for(i in players) {
+									$('#' + i).block();
+								}
+								chat('', "E' finito il primo giro di nomination");								
+								for(i in data.nominated) {							
+									players[data.nominated[i].fbId].nominated = true;											
 									chat('', data.nominated[i].name + " è stato nominato");
 								}																							
 								chat('', "Inizia il secondo round di nomination, il primo a votare è " + data.target.name);
 								if(<%=request.getParameter("player_id")%> == data.target.fbId) {
-									$('#players').unblock();
+									$('#players').unblock();									
 								} else {
 									$('#players').block();
 								}
 							} else if(data.msg == "NIGHT") {								
 								chat('', data.target.name + " è morto.");
+								players[data.target.fbId].alive = false;
+								resetVotes();
+								resetNominees();
 								chat('', "è notte");	
 								chat('', "I lupi aprono gli occhi.");	
 								$('#players').block();						
 							} else if(data.msg == "DEBATE") {
 								chat('', "E' giorno, e " + data.target.name + " è morto.");
+								players[data.target.fbId].alive = false;
 								$('#players').unblock();
 							} else if(data.msg == "ENDED") {
 								$('#players').block();
@@ -126,10 +141,13 @@
 							}
 						} else if(data.type == "VOTE") {
 							chat(data.player.name, "ha votato per <b>" + data.target.name + "</b>");	
+							players[data.target.fbId].votes++;
+							$('#' + data.target.fbId + " .votes").html(players[data.target.fbId].votes);
 							if(data.next) {						 						
 								chat('', "Ora è il turno di " + data.next.name);
 								if(<%=request.getParameter("player_id")%> == data.next.fbId) {
 									$('#players').unblock();
+									blockUnavailablePlayers();
 								} else {
 									$('#players').block();
 								}
@@ -138,11 +156,12 @@
 							if(data.next.fbId == <%=request.getParameter("player_id")%>) {
 								chat('', "E' il tuo turno di indicare un giocatore");
 								$('#players').unblock();
+								blockUnavailablePlayers();
 							} else {
 								chat('', "E' il turno di " + data.next.name + " di indicare un giocatore");
 							}
 						} else if(data.type == "NIGHTINFO") {
-							if(data.msg) {
+							if(data.msg == "true") {
 								chat('', data.target.name  + " è un lupo");
 							} else {
 								chat('', data.target.name  + " è un contadino");
