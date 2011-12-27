@@ -88,6 +88,13 @@ public class GameEngine {
 			dao.ofy().put(nextPlayer);
 			nextPlayer = getRandomAvailablePlayer();
 		}		
+		//Paranoia check
+		for(Player p : g.getPlayers(true)) {
+			if(p.getRole() == null) {
+				p.setRole(PlayerRole.CITIZEN);
+				dao.ofy().put(nextPlayer);
+			}
+		}
 		g.refreshPlayers();
 	}
 	
@@ -181,7 +188,12 @@ public class GameEngine {
 					return p;
 				}
 			}
-			return g.getPlayerByRole(PlayerRole.SEER);
+			if(computeDeadPlayerInNight() != null) {
+				return g.getPlayerByRole(PlayerRole.SEER);
+			} else {
+				resetVotes();
+				return g.getPlayerByRole(PlayerRole.WOLF);
+			}
 		} else if(lastVoter.getRole() == PlayerRole.SEER) {
 			return g.getPlayerByRole(PlayerRole.MEDIUM);
 		} else if(lastVoter.getRole() == PlayerRole.MEDIUM) {
@@ -249,8 +261,15 @@ public class GameEngine {
 	}
 	
 	public Player computeDeadPlayerInNight() {
-		Player dead = computeDeadPlayerInRound2();
-		if(dead.isBodyguarded()) {
+		int requiredVotes = g.getConfiguration().getHowManyWolves();
+		Player dead = null;
+		List<Player> players = g.getPlayers(true);
+		for(Player p : players) {
+			if(p.getVotes() == requiredVotes) {
+				dead = p;
+			}
+		}		
+		if(dead != null && dead.isBodyguarded()) {
 			return null;
 		} else {
 			return dead;

@@ -1,3 +1,5 @@
+<%@ page import="java.util.Date"%>
+
 <html>
 	<head>
 		<script type="text/javascript" src="https://www.google.com/jsapi?key=ABQIAAAArc-aBcMtas27GxefyJyUHhRL-CQUxo4cyKjOW-vmsVYovkcPkxQE2hJN1nGerTi9FsBBBwotb0LXSQ"></script>
@@ -5,8 +7,8 @@
 		<script type="text/javascript" src="js/jquery.blockUI.js"></script>
 		<script type="text/javascript" src="/_ah/channel/jsapi"></script>		
 		<script type="text/javascript" src="js/util.js?ver=1"></script>
-		<script type="text/javascript" src="js/play.js?ver=3"></script>
-		<link href="/style.css?ver=1" rel="stylesheet" type="text/css"/> 
+		<script type="text/javascript" src="js/play.js?ver=<%=new Date()%>"></script>
+		<link href="/style.css?ver=<%=new Date()%>" rel="stylesheet" type="text/css"/> 
 	</head>
 	<body>
 		<div id="play-main">
@@ -42,9 +44,9 @@
 						}
 					}
 					
-					$('.player-item').click(function() {
-						$('#players').block();
-						if(current_state === 'VOTING_1') {							
+					$('.player-item').click(function() {						
+						if(current_state !== 'DEBATE') {
+							$('#players').block();							
 							$.post('/vote', {"target_id": this.id, "game_id": "<%=request.getParameter("game_id")%>", "voter_id":"<%=request.getParameter("player_id")%>"});
 						}
 					});
@@ -56,12 +58,12 @@
 					
 					if("<%=request.getParameter("player_id")%>" === resp.owner.fbId) {
 						$('#stop-debate').show();
+						$('#stop-debate').click(function() {
+							$.post('/change-state', {"game_id":"<%=request.getParameter("game_id")%>","state":"VOTING_1"});
+							$('#stop-debate').hide();
+						});
 					}
-					
-					$('#stop-debate').click(function() {
-						$.post('/change-state', {"game_id":"<%=request.getParameter("game_id")%>","state":"VOTING_1"});
-					});
-					
+													
 					$('#chat-text').click(function() {
 						$('#chat-text').val("");
 					});
@@ -89,8 +91,8 @@
 							console.info(url);
 							location.replace(url);						
 						} else if(data.type == "GAMESTATE") {
-							if(data.msg === "VOTING_1") {
-								current_state = data.msg;
+							current_state = data.msg;
+							if(data.msg === "VOTING_1") {								
 								chat('', "Inizia il primo round di nomination, il primo a votare è " + data.target.name);
 								if(<%=request.getParameter("player_id")%> == data.target.fbId) {
 									$('#players').unblock();
@@ -98,12 +100,10 @@
 								} else {
 									$('#players').block();
 								}
-							} else if(data.msg == "VOTING_2") {
+							} else if(data.msg == "VOTING_2") {								
 								$('#players').unblock();
 								var splitted = data.msg.split("|");								
-								for(i in players) {
-									$('#' + i).block();
-								}
+								resetVotes();
 								chat('', "E' finito il primo giro di nomination");								
 								for(i in data.nominated) {							
 									players[data.nominated[i].fbId].nominated = true;											
@@ -111,13 +111,15 @@
 								}																							
 								chat('', "Inizia il secondo round di nomination, il primo a votare è " + data.target.name);
 								if(<%=request.getParameter("player_id")%> == data.target.fbId) {
-									$('#players').unblock();									
+									$('#players').unblock();
+									blockUnavailablePlayers();									
 								} else {
 									$('#players').block();
 								}
 							} else if(data.msg == "NIGHT") {								
 								chat('', data.target.name + " è morto.");
 								players[data.target.fbId].alive = false;
+								$('#' + data.target.fbId).addClass('dead-player');
 								resetVotes();
 								resetNominees();
 								chat('', "è notte");	
@@ -125,14 +127,19 @@
 								$('#players').block();						
 							} else if(data.msg == "DEBATE") {
 								chat('', "E' giorno, e " + data.target.name + " è morto.");
+								$('#' + data.target.fbId).addClass('dead-player');
 								players[data.target.fbId].alive = false;
 								$('#players').unblock();
+								if("<%=request.getParameter("player_id")%>" === resp.owner.fbId) {
+									$('#stop-debate').show();
+								}
 							} else if(data.msg == "ENDED") {
 								$('#players').block();
 								chat('', "Il gioco è finito.");
 							} else if(data.msg == "SEER") {
 								chat('', "I lupi chiudono gli occhi.");
 								chat('', "Il veggente apre gli occhi e indica un giocatore");
+								resetVotes();
 								$('#players').block();
 							} else if(data.msg == "MEDIUM") {
 								chat('', "Il veggente chiude gli occhi.");
@@ -142,7 +149,7 @@
 						} else if(data.type == "VOTE") {
 							chat(data.player.name, "ha votato per <b>" + data.target.name + "</b>");	
 							players[data.target.fbId].votes++;
-							$('#' + data.target.fbId + " .votes").html(players[data.target.fbId].votes);
+							$('#' + data.target.fbId + " .votes").html(players[data.target.fbId].votes).show();
 							if(data.next) {						 						
 								chat('', "Ora è il turno di " + data.next.name);
 								if(<%=request.getParameter("player_id")%> == data.next.fbId) {

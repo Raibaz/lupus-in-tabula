@@ -3,6 +3,14 @@
 	list-style-type: none;
 }
 
+#players-list .player-item .votes {
+	color: red;
+}
+
+#players-list .dead-player {
+	text-decoration: line-through;
+} 
+
 #play-main {
 	width: 100%;
 	height: 90%;
