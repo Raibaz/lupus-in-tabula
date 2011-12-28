@@ -7,5 +7,7 @@ public enum GameState {
 	DEBATE,
 	VOTING_1,
 	VOTING_2,
-	ENDED	
+	DEFENSE,
+	ENDED,
+	ARCHIVED
 }

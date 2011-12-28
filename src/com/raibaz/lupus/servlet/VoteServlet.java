@@ -127,13 +127,14 @@ public class VoteServlet extends HttpServlet {
 		GameEngine engine = new GameEngine(g);
 		LupusDAO dao = new LupusDAO();
 		if(g.getState() == GameState.VOTING_1) {
-			g.setState(GameState.VOTING_2);
+			g.setState(GameState.DEFENSE);
 			ArrayList<Player> votedPlayers = engine.computeVotedIdsInRound1();
 			engine.resetVotes();
 			LupusMessage stateMsg = new LupusMessage(MessageType.GAMESTATE, voter);
-			stateMsg.setMsg(GameState.VOTING_2.toString());
-			stateMsg.setNominated(votedPlayers);				
-			stateMsg.setTarget(engine.determineNextVoterInRound2(g.getLastDead()));
+			stateMsg.setMsg(GameState.DEFENSE.toString());
+			stateMsg.setNominated(votedPlayers);
+			stateMsg.setTarget(votedPlayers.get(0));
+			//stateMsg.setTarget(engine.determineNextVoterInRound2(g.getLastDead()));
 			stateMsg.broadcastToPlayingPlayers(g);
 		} else if(g.getState() == GameState.VOTING_2) {
 			g.setState(GameState.NIGHT);

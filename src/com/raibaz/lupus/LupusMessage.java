@@ -18,7 +18,8 @@ public class LupusMessage extends AbsJsonable {
 		GAMESTATE,
 		VOTE,
 		NIGHTVOTE,
-		NIGHTINFO
+		NIGHTINFO,
+		ROLEINFO
 	}		
 	
 	private MessageType type;

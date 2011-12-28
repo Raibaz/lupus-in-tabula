@@ -84,6 +84,22 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<servlet-name>Vote</servlet-name>
 		<url-pattern>/vote</url-pattern>
 	</servlet-mapping>	
+	<servlet>
+		<servlet-name>ArchiveGame</servlet-name>
+		<servlet-class>com.raibaz.lupus.servlet.ArchiveGameServlet</servlet-class>
+	</servlet>	
+	<servlet-mapping>
+		<servlet-name>ArchiveGame</servlet-name>
+		<url-pattern>/archive-game</url-pattern>
+	</servlet-mapping>	
+	<servlet>
+		<servlet-name>GetRole</servlet-name>
+		<servlet-class>com.raibaz.lupus.servlet.GetRoleServlet</servlet-class>
+	</servlet>	
+	<servlet-mapping>
+		<servlet-name>GetRole</servlet-name>
+		<url-pattern>/get-role</url-pattern>
+	</servlet-mapping>	
 	<welcome-file-list>
 		<welcome-file>index.jsp</welcome-file>
 	</welcome-file-list>

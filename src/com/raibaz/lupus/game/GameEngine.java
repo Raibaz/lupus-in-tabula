@@ -92,7 +92,7 @@ public class GameEngine {
 		for(Player p : g.getPlayers(true)) {
 			if(p.getRole() == null) {
 				p.setRole(PlayerRole.CITIZEN);
-				dao.ofy().put(nextPlayer);
+				dao.ofy().put(p);
 			}
 		}
 		g.refreshPlayers();

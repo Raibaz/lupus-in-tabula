@@ -40,8 +40,7 @@
 				
 				channel = new goog.appengine.Channel('<%=request.getParameter("channel_token")%>');
 				socket = channel.open();				
-				socket.onmessage = function(message) {
-					console.info(message.data);
+				socket.onmessage = function(message) {					
 					data = JSON.parse(message.data);
 					if(data.type == "JOIN") {
 						$('#players-list').append('<li id="' + data.player.fbId + '"><img src="' + data.player.pictureUrl + '"/>' + data.player.name + ' </li>');
