@@ -15,6 +15,7 @@ public class Game extends AbsJsonable {
 	private String id;
 	@Embedded @Indexed
 	private List<Player> players = new ArrayList<Player>();
+	@Indexed
 	private GameState state;
 	private String name;
 	@Embedded

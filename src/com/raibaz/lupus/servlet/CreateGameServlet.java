@@ -29,7 +29,7 @@ public class CreateGameServlet extends HttpServlet {
 			return;
 		}
 							
-		g.setName("gamename");		
+		g.setName("Partita");		
 		g.setId(owner.getFbId() + "-" + new Date().getTime());
 		
 		ChannelService chanServ = ChannelServiceFactory.getChannelService();

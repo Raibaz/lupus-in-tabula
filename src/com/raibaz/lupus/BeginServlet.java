@@ -49,7 +49,7 @@ public class BeginServlet extends HttpServlet {
 			if(ownedGame != null) {			
 				String newToken = ChannelServiceFactory.getChannelService().createChannel(p.getFbId() + "-waiting");
 				
-				resp.sendRedirect("/waiting_game.jsp?game_id=" + ownedGame.getId() + "&channel_token=" + newToken);
+				resp.sendRedirect("/waiting_game.jsp?is_owner=true&game_id=" + ownedGame.getId() + "&channel_token=" + newToken);
 			} else {
 				resp.sendRedirect("/index.jsp?player_name=" + p.getName() + "&player_avatar=" + p.getPictureUrl() + "&player_id=" + p.getFbId());
 			}

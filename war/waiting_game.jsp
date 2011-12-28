@@ -6,7 +6,7 @@
 		<link href="/style.css" rel="stylesheet" type="text/css"/> 
 	</head>
 	<body>
-		O hai, you are waiting for players to join game <%= request.getParameter("game_id")%>
+		In attesa di giocatori...non chiudere questa pagina!
 		
 		<div id="players">
 			<ul id="players-list">				
@@ -16,7 +16,8 @@
 		<% 
 			if(request.getParameter("is_owner") != null && request.getParameter("is_owner").equals("true")) {
 		%>
-			<a href="#" id="start_game">Comincia la partita!</a>
+			<a href="#" id="start_game">Comincia la partita!</a><br/>
+			<a href="#" id="archive_game">Elimina la partita!</a>
 		<%
 			}
 		%>
@@ -55,7 +56,11 @@
 				
 				$('#start_game').click(function() {
 					$.post('/start_game', {"game_id": "<%=request.getParameter("game_id")%>"});
-				});			
+				});
+							
+				$('#archive_game').click(function() {
+					$.post('/archive-game', {"game_id": "<%=request.getParameter("game_id")%>","player_id":"<%=request.getParameter("player_id")%>"});
+				});
 			});
 		</script>
 	</body>

@@ -26,7 +26,12 @@ public class LupusDAO extends DAOBase {
 	public Game getOwnedGame(Player p) {
 		List<Game> games = ofy().query(Game.class).filter("owner.fbId", p.getFbId()).list();
 		if(!games.isEmpty()) {
-			return games.get(0);
+			for(Game g : games) {
+				if(g.getState() != GameState.ARCHIVED) {
+					return g;
+				}
+			}
+			return null;
 		} else {
 			return null;
 		}

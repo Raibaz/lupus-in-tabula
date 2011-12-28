@@ -51,7 +51,7 @@
 						game_id = $(this).parent().attr("id");
 						$.post('/join_game', {"game": game_id, "player_id": '<%=currentPlayer.getFbId()%>'}, function(data) {
 							resp = JSON.parse(data);
-							location.replace("/waiting_game.jsp?game_id=" + resp.id + "&channel_token=" + resp.channelToken);
+							location.replace("/waiting_game.jsp?game_id=" + resp.id + "&channel_token=" + resp.channelToken + "&player_id="+"<%=currentPlayer.getFbId()%>");
 						});
 					});
 					
@@ -62,7 +62,7 @@
 				$('#create_game').attr('disabled', 'true');
 				$.post('/create_game', {player_id:'<%=currentPlayer.getFbId()%>'}, function(data) {
 					resp = JSON.parse(data);				
-					url = "/waiting_game.jsp?is_owner=true&game_id=" + resp.id + "&channel_token=" + resp.channelToken;
+					url = "/waiting_game.jsp?is_owner=true&game_id=" + resp.id + "&channel_token=" + resp.channelToken + "&player_id="+"<%=currentPlayer.getFbId()%>";
 					console.info(url);
 					location.replace(url);										
 				});
