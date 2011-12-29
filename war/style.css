@@ -1,3 +1,7 @@
+#gamelist .invited {
+	border: 1px solid red;
+}
+
 #players-list li {
 	display: none;
 	list-style-type: none;

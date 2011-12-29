@@ -4,12 +4,16 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import com.google.appengine.repackaged.com.google.common.util.Base64;
 import com.google.appengine.repackaged.com.google.common.util.Base64DecoderException;
 import com.google.appengine.repackaged.org.json.JSONException;
 import com.google.appengine.repackaged.org.json.JSONObject;
+import com.raibaz.lupus.dao.LupusDAO;
+import com.raibaz.lupus.game.Game;
 import com.raibaz.lupus.game.Player;
 import com.restfb.DefaultFacebookClient;
 import com.restfb.Parameter;
@@ -45,24 +49,29 @@ public class FacebookAPI {
 		}
 	}
 	
-	public String getGameIdFromRequest(String requestIds) {
+	public List<String> getGamesFromRequests(String requestIds) {
 		DefaultFacebookClient client = new DefaultFacebookClient(accessToken);
-		if(requestIds.indexOf(",") != -1) {
-			requestIds = requestIds.substring(0,  requestIds.indexOf(","));
-		}
-		JsonObject requestJson = client.fetchObject(requestIds, JsonObject.class);
-		String ret = null;
-		try {
-			ret = requestJson.getString("data");
-		} catch (JsonException jsone) {
-			//Do nothing
-		} catch (FacebookGraphException fge) {
-			//Do nothing, probably requested a request_id already deleted
-		}
-		//client.deleteObject(requestId);
+		ArrayList<String> ret = new ArrayList<String>();
+		LupusDAO dao = new LupusDAO();
+		String[] split = requestIds.split(",");
+		
+		for(String s : split) {		
+			JsonObject requestJson = client.fetchObject(s, JsonObject.class);		
+			try {
+				String gameId = requestJson.getString("data");
+				if(gameId != null) {
+					ret.add(gameId);
+				}
+				client.deleteObject(s);
+			} catch (JsonException jsone) {
+				//Do nothing
+			} catch (FacebookGraphException fge) {
+				//Do nothing, probably requested a request_id already deleted
+			}			
+		}		
 		return ret;
 	}
-	
+			
 	private static JSONObject getDataFromSignedRequest(String signedRequest) {
 		String[] split = signedRequest.split("\\.");
 		String decodedData = "";

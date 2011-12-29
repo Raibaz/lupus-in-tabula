@@ -6,6 +6,7 @@ import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.util.DAOBase;
 import com.raibaz.lupus.game.Game;
 import com.raibaz.lupus.game.GameState;
+import com.raibaz.lupus.game.Invite;
 import com.raibaz.lupus.game.Player;
 
 public class LupusDAO extends DAOBase {
@@ -13,6 +14,7 @@ public class LupusDAO extends DAOBase {
 	static {
 		ObjectifyService.register(Player.class);
 		ObjectifyService.register(Game.class);
+		ObjectifyService.register(Invite.class);
 	}
 	
 	public Player getPlayer(String fbId) {
@@ -34,6 +36,17 @@ public class LupusDAO extends DAOBase {
 			return null;
 		} else {
 			return null;
+		}
+	}
+	
+	public List<Invite> getUserInvites(String playerId) {
+		return ofy().query(Invite.class).filter("invitedId", playerId).list();		
+	}
+	
+	public void deleteGameInvites(String gameId) {
+		List<Invite> invites = ofy().query(Invite.class).filter("gameId", gameId).list();
+		for(Invite i : invites) {
+			ofy().delete(i);
 		}
 	}
 	

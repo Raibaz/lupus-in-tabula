@@ -31,6 +31,7 @@ public class CreateGameServlet extends HttpServlet {
 							
 		g.setName("Partita");		
 		g.setId(owner.getFbId() + "-" + new Date().getTime());
+		g.setCreationDate(new Date());
 		
 		ChannelService chanServ = ChannelServiceFactory.getChannelService();
 		String chanToken = chanServ.createChannel(owner.getFbId() + "-waiting");

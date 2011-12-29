@@ -1,6 +1,7 @@
 package com.raibaz.lupus.game;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Embedded;
@@ -24,7 +25,11 @@ public class Game extends AbsJsonable {
 	private Player owner;
 	
 	@Embedded @Indexed
-	private Player lastDead;	
+	private Player lastDead;
+	
+	private Date creationDate;
+	
+	private boolean invited;
 	
 	public Game() {
 		state = GameState.WAITING;
@@ -133,5 +138,25 @@ public class Game extends AbsJsonable {
 	}
 	public void setLastDead(Player lastDead) {
 		this.lastDead = lastDead;
-	}	
+	}
+
+	public boolean getInvited() {
+		return invited;
+	}
+
+	public void setInvited(boolean invited) {
+		this.invited = invited;
+	}
+
+	public void setConfiguration(GameConfiguration configuration) {
+		this.configuration = configuration;
+	}
+
+	public Date getCreationDate() {
+		return creationDate;
+	}
+
+	public void setCreationDate(Date creationDate) {
+		this.creationDate = creationDate;
+	}
 }

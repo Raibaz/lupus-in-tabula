@@ -1,5 +1,6 @@
 package com.raibaz.lupus;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServlet;
@@ -10,6 +11,7 @@ import com.google.appengine.api.channel.ChannelServiceFactory;
 import com.raibaz.lupus.dao.LupusDAO;
 import com.raibaz.lupus.facebook.FacebookAPI;
 import com.raibaz.lupus.game.Game;
+import com.raibaz.lupus.game.Invite;
 import com.raibaz.lupus.game.Player;
 
 @SuppressWarnings("serial")
@@ -45,11 +47,16 @@ public class BeginServlet extends HttpServlet {
 				}
 				dao.ofy().put(p);
 			}
-			
-			String invitedGameId = null;
+						
 			if(req.getParameter("request_ids") != null) {			
 				log.info("Received request ids! " + req.getParameter("request_ids"));
-				invitedGameId = fb.getGameIdFromRequest(req.getParameter("request_ids"));				
+				List<String> invitedGameIds = fb.getGamesFromRequests(req.getParameter("request_ids"));
+				for(String s : invitedGameIds) {
+					Invite i = new Invite();
+					i.setGameId(s);
+					i.setInvitedId(p.getFbId());
+					dao.ofy().put(i);
+				}
 			}
 									
 			Game ownedGame = dao.getOwnedGame(p);
@@ -58,7 +65,7 @@ public class BeginServlet extends HttpServlet {
 				
 				resp.sendRedirect("/waiting_game.jsp?is_owner=true&game_id=" + ownedGame.getId() + "&channel_token=" + newToken);
 			} else {
-				resp.sendRedirect("/index.jsp?player_name=" + p.getName() + "&player_avatar=" + p.getPictureUrl() + "&player_id=" + p.getFbId() + "&invited_id=" + invitedGameId);
+				resp.sendRedirect("/index.jsp?player_name=" + p.getName() + "&player_avatar=" + p.getPictureUrl() + "&player_id=" + p.getFbId());
 			}
 		} else {
 			log.info("Request from fb without signed_request!");

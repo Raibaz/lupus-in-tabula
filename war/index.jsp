@@ -1,6 +1,7 @@
 <%@page import="com.google.appengine.api.channel.*"%>
 <%@page import="com.raibaz.lupus.facebook.*"%>
 <%@page import="com.raibaz.lupus.game.*"%>
+<%@ page import="java.util.Date"%>
 
 <%		
 	Player currentPlayer = new Player();
@@ -20,18 +21,13 @@
 
 <html>
 	<head>
+		<link href="/style.css?ver=<%=new Date()%>" rel="stylesheet" type="text/css"/> 
 		<script type="text/javascript" src="https://www.google.com/jsapi?key=ABQIAAAArc-aBcMtas27GxefyJyUHhRL-CQUxo4cyKjOW-vmsVYovkcPkxQE2hJN1nGerTi9FsBBBwotb0LXSQ"></script>
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 		<script type="text/javascript" src="/_ah/channel/jsapi"></script>
 		<script type="text/javascript">
 			if(<%=request.getParameter("need_authentication")%> == true) {				
 				top.location.href = "https://www.facebook.com/dialog/oauth?client_id=183863271686299&redirect_uri=https://apps.facebook.com/lupusintabula/";
-			}
-			if("<%=request.getParameter("invited_id")%>" != null) {				
-				$.post('/join_game', {"game": "<%=request.getParameter("invited_id")%>", "player_id": '<%=currentPlayer.getFbId()%>'}, function(data) {
-					resp = JSON.parse(data);
-					window.location.replace("/waiting_game.jsp?game_id=" + resp.id + "&channel_token=" + resp.channelToken + "&player_id="+"<%=currentPlayer.getFbId()%>");
-				});							
 			}			
 		</script>
 	</head>
@@ -46,12 +42,16 @@
 			});	
 			
 			function updateGameList() {
-				$.post('/list_games', function(data) {
+				$.post('/list_games', {"player_id":"<%=currentPlayer.getFbId()%>"}, function(data) {
 					resp = JSON.parse(data);	
 					$('#gamelist').html("");				
 					for(i in resp) {
 						game = resp[i];
-						$('#gamelist').append('<li id="' + game.id + '">' + game.name + ' creata da ' + game.owner.name + ' - <a href="#" class="join_link">Unisciti</a></li>');
+						li_class = "";
+						if(game.invited) {
+							li_class = "invited";
+						}						
+						$('#gamelist').append('<li id="' + game.id + '" class="' + li_class + '">' + game.name + ' creata da ' + game.owner.name + ' - <a href="#" class="join_link">Unisciti</a></li>');
 					}
 					$('#gamelist li a').click(function() {						
 						game_id = $(this).parent().attr("id");
