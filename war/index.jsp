@@ -27,11 +27,17 @@
 			if(<%=request.getParameter("need_authentication")%> == true) {				
 				top.location.href = "https://www.facebook.com/dialog/oauth?client_id=183863271686299&redirect_uri=https://apps.facebook.com/lupusintabula/";
 			}
+			if("<%=request.getParameter("invited_id")%>" != null) {				
+				$.post('/join_game', {"game": "<%=request.getParameter("invited_id")%>", "player_id": '<%=currentPlayer.getFbId()%>'}, function(data) {
+					resp = JSON.parse(data);
+					window.location.replace("/waiting_game.jsp?game_id=" + resp.id + "&channel_token=" + resp.channelToken + "&player_id="+"<%=currentPlayer.getFbId()%>");
+				});							
+			}			
 		</script>
 	</head>
 	<body>
 		<div id="welcome"><img src="<%=currentPlayer.getPictureUrl()%>"/> Welcome, <%=currentPlayer.getName()%></div>
-		<div id="create"><a id="create_game">Create a new game</a>
+		<div id="create"><input type="button" id="create_game" value="Crea una partita"/>
 		<div id="games"><ul id="gamelist"></ul></div>
 		<script type="text/javascript">
 			$(document).ready(function() {				
@@ -51,7 +57,7 @@
 						game_id = $(this).parent().attr("id");
 						$.post('/join_game', {"game": game_id, "player_id": '<%=currentPlayer.getFbId()%>'}, function(data) {
 							resp = JSON.parse(data);
-							location.replace("/waiting_game.jsp?game_id=" + resp.id + "&channel_token=" + resp.channelToken + "&player_id="+"<%=currentPlayer.getFbId()%>");
+							window.location.replace("/waiting_game.jsp?game_id=" + resp.id + "&channel_token=" + resp.channelToken + "&player_id="+"<%=currentPlayer.getFbId()%>");
 						});
 					});
 					
@@ -64,7 +70,7 @@
 					resp = JSON.parse(data);				
 					url = "/waiting_game.jsp?is_owner=true&game_id=" + resp.id + "&channel_token=" + resp.channelToken + "&player_id="+"<%=currentPlayer.getFbId()%>";
 					console.info(url);
-					location.replace(url);										
+					window.location.replace(url);										
 				});
 			});
 			

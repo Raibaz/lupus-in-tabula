@@ -13,6 +13,9 @@ import com.google.appengine.repackaged.org.json.JSONObject;
 import com.raibaz.lupus.game.Player;
 import com.restfb.DefaultFacebookClient;
 import com.restfb.Parameter;
+import com.restfb.exception.FacebookGraphException;
+import com.restfb.json.JsonException;
+import com.restfb.json.JsonObject;
 import com.restfb.types.User;
 
 public class FacebookAPI {
@@ -42,13 +45,30 @@ public class FacebookAPI {
 		}
 	}
 	
+	public String getGameIdFromRequest(String requestIds) {
+		DefaultFacebookClient client = new DefaultFacebookClient(accessToken);
+		if(requestIds.indexOf(",") != -1) {
+			requestIds = requestIds.substring(0,  requestIds.indexOf(","));
+		}
+		JsonObject requestJson = client.fetchObject(requestIds, JsonObject.class);
+		String ret = null;
+		try {
+			ret = requestJson.getString("data");
+		} catch (JsonException jsone) {
+			//Do nothing
+		} catch (FacebookGraphException fge) {
+			//Do nothing, probably requested a request_id already deleted
+		}
+		//client.deleteObject(requestId);
+		return ret;
+	}
+	
 	private static JSONObject getDataFromSignedRequest(String signedRequest) {
 		String[] split = signedRequest.split("\\.");
 		String decodedData = "";
 		
 		try {
-			decodedData = new String(Base64.decodeWebSafe(split[1]));
-			log.info("FACEBOOKAPI!!" + decodedData);			
+			decodedData = new String(Base64.decodeWebSafe(split[1]));			
 		} catch (Base64DecoderException uee) {}
 
 		try {

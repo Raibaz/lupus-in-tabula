@@ -27,17 +27,18 @@ public class BeginServlet extends HttpServlet {
 	
 	private void process(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		LupusDAO dao = new LupusDAO();
-		
-		if(req.getParameter("signed_request") != null) {
-			log.info("signed request = " + req.getParameter("signed_request"));
-			String fbId = FacebookAPI.getUserIdFromSignedRequest(req.getParameter("signed_request"));
+					
+		if(req.getParameter("signed_request") != null) {			
+			FacebookAPI fb = new FacebookAPI(FacebookAPI.getAccessTokenFromSignedRequest(req.getParameter("signed_request")));
+			
+									
+			String fbId = FacebookAPI.getUserIdFromSignedRequest(req.getParameter("signed_request"));			
 			if(fbId == null) {				
 				resp.sendRedirect("/index.jsp?need_authentication=true");
 				return;
-			}
+			}			
 			Player p = dao.getPlayer(fbId);
-			if(p == null) {		
-				FacebookAPI fb = new FacebookAPI(FacebookAPI.getAccessTokenFromSignedRequest(req.getParameter("signed_request")));
+			if(p == null) {										
 				p = fb.getPlayerProfile();
 				if(p == null || p.getFbId() == null) {
 					resp.sendRedirect("/index.jsp?need_authentication=true");
@@ -45,13 +46,19 @@ public class BeginServlet extends HttpServlet {
 				dao.ofy().put(p);
 			}
 			
+			String invitedGameId = null;
+			if(req.getParameter("request_ids") != null) {			
+				log.info("Received request ids! " + req.getParameter("request_ids"));
+				invitedGameId = fb.getGameIdFromRequest(req.getParameter("request_ids"));				
+			}
+									
 			Game ownedGame = dao.getOwnedGame(p);
 			if(ownedGame != null) {			
 				String newToken = ChannelServiceFactory.getChannelService().createChannel(p.getFbId() + "-waiting");
 				
 				resp.sendRedirect("/waiting_game.jsp?is_owner=true&game_id=" + ownedGame.getId() + "&channel_token=" + newToken);
 			} else {
-				resp.sendRedirect("/index.jsp?player_name=" + p.getName() + "&player_avatar=" + p.getPictureUrl() + "&player_id=" + p.getFbId());
+				resp.sendRedirect("/index.jsp?player_name=" + p.getName() + "&player_avatar=" + p.getPictureUrl() + "&player_id=" + p.getFbId() + "&invited_id=" + invitedGameId);
 			}
 		} else {
 			log.info("Request from fb without signed_request!");

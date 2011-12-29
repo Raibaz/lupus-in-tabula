@@ -91,6 +91,14 @@ public class LupusMessage extends AbsJsonable {
 		}
 	}
 	
+	public void broadcastToWaitingPlayers(Game g) {
+		ChannelService chanServ = ChannelServiceFactory.getChannelService();
+		for(Player p : g.getPlayers()) {
+			chanServ.sendMessage(new ChannelMessage(p.getFbId() + "-waiting", this.toJSONString()));			
+		}
+	}
+	
+	
 	public void broadcastToPlayersByRole(Game g, PlayerRole role) {
 		ChannelService chanServ = ChannelServiceFactory.getChannelService();
 		for(Player p : g.getPlayers()) {

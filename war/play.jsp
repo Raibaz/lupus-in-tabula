@@ -98,7 +98,7 @@
 							chat(data.player.name, data.msg);							 
 						} else if(data.type == "GAMESTATE" && data.msg && data.msg.indexOf("start__") == 0) {																			
 							url = "/play.jsp?player_id=" + data.player.fbId + "&game_id=" + data.gameId + '&channel_token=' + data.msg.substring("start__".length);							
-							location.replace(url);						
+							window.location.replace(url);						
 						} else if(data.type == "GAMESTATE") {
 							current_state = data.msg;
 							if(data.msg === "VOTING_1") {								
@@ -163,7 +163,7 @@
 								startDefenseTimer(data.target, <%=request.getParameter("player_id")%>);								
 							} else if(data.msg == "ARCHIVED") {
 								socket.close();
-								setTimeout('location.replace("/game_finished.jsp");', 5000);
+								setTimeout('window.location.replace("/game_finished.jsp");', 5000);
 								chat('', "Il moderatore ha deciso di concludere la partita, verrete reindirizzati alla pagina successiva tra 5 secondi...");
 							}
 						} else if(data.type == "VOTE") {

@@ -3,6 +3,7 @@
 		<script type="text/javascript" src="https://www.google.com/jsapi?key=ABQIAAAArc-aBcMtas27GxefyJyUHhRL-CQUxo4cyKjOW-vmsVYovkcPkxQE2hJN1nGerTi9FsBBBwotb0LXSQ"></script>
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 		<script type="text/javascript" src="/_ah/channel/jsapi"></script>
+		<script src="http://connect.facebook.net/en_US/all.js"></script>
 		<link href="/style.css" rel="stylesheet" type="text/css"/> 
 	</head>
 	<body>
@@ -13,6 +14,7 @@
 			</ul>
 		</div>
 		
+		
 		<% 
 			if(request.getParameter("is_owner") != null && request.getParameter("is_owner").equals("true")) {
 		%>
@@ -21,6 +23,14 @@
 		<%
 			}
 		%>
+		
+		<div id="invite">
+			<a href="#" id="invite-friends">Invita dei tuoi amici a questa partita</a>
+		</div>
+		
+		<div id="messages">&nbsp;</div>
+		
+		<div id="fb-root">&nbsp;</div>
 		
 		
 		<script type="text/javascript">
@@ -46,11 +56,16 @@
 					if(data.type == "JOIN") {
 						$('#players-list').append('<li id="' + data.player.fbId + '"><img src="' + data.player.pictureUrl + '"/>' + data.player.name + ' </li>');
 						$('#'+data.player.fbId).fadeIn();
-					} else if(data.type == "GAMESTATE" && data.msg.indexOf("start__") == 0) {																			
-						url = "/play.jsp?player_id=" + data.target.fbId + "&game_id=" + data.gameId + '&channel_token=' + data.msg.substring("start__".length);
-						console.info(url);
-						socket.close();
-						location.replace(url);						
+					} else if(data.type == "GAMESTATE") {
+						if(data.msg.indexOf("start__") == 0) {																			
+							url = "/play.jsp?player_id=" + data.target.fbId + "&game_id=" + data.gameId + '&channel_token=' + data.msg.substring("start__".length);
+							console.info(url);
+							socket.close();
+							window.location.replace(url);						
+						} else if(data.msg == "ARCHIVED") {
+							$('#messages').html("La partita è stata cancellata, verrete rediretti alla pagina iniziale tra 5 secondi...");
+							setTimeout('window.location.replace("https://apps.facebook.com/lupusintabula");', 5000);
+						}
 					}
 				};	
 				
@@ -59,7 +74,14 @@
 				});
 							
 				$('#archive_game').click(function() {
-					$.post('/archive-game', {"game_id": "<%=request.getParameter("game_id")%>","player_id":"<%=request.getParameter("player_id")%>"});
+					$.post('/archive-game', {"game_id": "<%=request.getParameter("game_id")%>","player_id":"<%=request.getParameter("player_id")%>"}, function(data) {
+						window.location.replace("https://apps.facebook.com/lupusintabula");
+					});
+				});				
+				
+				$('#invite-friends').click(function() {
+					FB.init({appId:'183863271686299', cookie:true,status:true, xfbml:true,frictionlessRequests:true});
+     				FB.ui({ method: 'apprequests',message: 'Seleziona quali amici vuoi invitare. Attenzione: è preferibile invitare amici che sono già online.',data: '<%=request.getParameter("game_id")%>'});
 				});
 			});
 		</script>
