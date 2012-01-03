@@ -8,8 +8,8 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/junit-4.8.2.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/mockito-all-1.8.5.jar"/>
 	<classpathentry kind="lib" path="C:/dev/appengine-java-sdk-1.5.3/lib/impl/appengine-api.jar"/>
-	<classpathentry kind="lib" path="C:/dev/appengine-java-sdk-1.5.3/lib/impl/appengine-api-labs.jar"/>
 	<classpathentry kind="lib" path="C:/dev/appengine-java-sdk-1.5.3/lib/impl/appengine-api-stubs.jar"/>
 	<classpathentry kind="lib" path="C:/dev/appengine-java-sdk-1.5.3/lib/testing/appengine-testing.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/json-20080701.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

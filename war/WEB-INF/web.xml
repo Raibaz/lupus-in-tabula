@@ -100,6 +100,14 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<servlet-name>GetRole</servlet-name>
 		<url-pattern>/get-role</url-pattern>
 	</servlet-mapping>	
+	<servlet>
+		<servlet-name>ArchiveOldGames</servlet-name>
+		<servlet-class>com.raibaz.lupus.servlet.admin.ArchiveOldGamesServlet</servlet-class>
+	</servlet>	
+	<servlet-mapping>
+		<servlet-name>ArchiveOldGames</servlet-name>
+		<url-pattern>/admin/archive_old</url-pattern>
+	</servlet-mapping>	
 	<welcome-file-list>
 		<welcome-file>index.jsp</welcome-file>
 	</welcome-file-list>

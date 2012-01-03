@@ -1,5 +1,7 @@
 package com.raibaz.lupus.dao;
 
+import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import com.googlecode.objectify.ObjectifyService;
@@ -48,6 +50,40 @@ public class LupusDAO extends DAOBase {
 		for(Invite i : invites) {
 			ofy().delete(i);
 		}
+	}
+	
+	public int archiveWaitingGamesOlderThan(Date treshold) {
+		List<Game> olderGames = ofy().query(Game.class).filter("creationDate < ", treshold).filter("state", GameState.WAITING.toString()).list();
+		int ret = 0;
+		for(Game g : olderGames) {
+			if(g.getState() == GameState.WAITING) {
+				g.setState(GameState.ARCHIVED);				
+				ofy().put(g);			
+				List<Invite> invites = ofy().query(Invite.class).filter("gameId", g.getId()).list();
+				for(Invite i : invites) {
+					ofy().delete(i);
+				}
+				ret++;
+			}
+		}		
+		return ret;
+	}
+	
+	public int archiveGamesOlderThan(Date treshold) {
+		List<Game> olderGames = ofy().query(Game.class).filter("creationDate < ", treshold).filter("state != ", GameState.ARCHIVED).list();
+		int ret = 0;
+		for(Game g : olderGames) {
+			if(g.getState() != GameState.ARCHIVED) {
+				g.setState(GameState.ARCHIVED);
+				ofy().put(g);
+				List<Invite> invites = ofy().query(Invite.class).filter("gameId", g.getId()).list();
+				for(Invite i : invites) {
+					ofy().delete(i);
+				}
+				ret++;
+			}
+		}
+		return ret;
 	}
 	
 }

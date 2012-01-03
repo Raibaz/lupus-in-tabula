@@ -29,7 +29,7 @@ public class Game extends AbsJsonable {
 	
 	private Date creationDate;
 	
-	private boolean invited;
+	private Player inviter;
 	
 	public Game() {
 		state = GameState.WAITING;
@@ -140,14 +140,6 @@ public class Game extends AbsJsonable {
 		this.lastDead = lastDead;
 	}
 
-	public boolean getInvited() {
-		return invited;
-	}
-
-	public void setInvited(boolean invited) {
-		this.invited = invited;
-	}
-
 	public void setConfiguration(GameConfiguration configuration) {
 		this.configuration = configuration;
 	}
@@ -158,5 +150,13 @@ public class Game extends AbsJsonable {
 
 	public void setCreationDate(Date creationDate) {
 		this.creationDate = creationDate;
+	}
+
+	public Player getInviter() {
+		return inviter;
+	}
+
+	public void setInviter(Player inviter) {
+		this.inviter = inviter;
 	}
 }

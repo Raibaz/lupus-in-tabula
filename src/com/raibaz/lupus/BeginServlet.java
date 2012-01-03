@@ -50,10 +50,8 @@ public class BeginServlet extends HttpServlet {
 						
 			if(req.getParameter("request_ids") != null) {			
 				log.info("Received request ids! " + req.getParameter("request_ids"));
-				List<String> invitedGameIds = fb.getGamesFromRequests(req.getParameter("request_ids"));
-				for(String s : invitedGameIds) {
-					Invite i = new Invite();
-					i.setGameId(s);
+				List<Invite> invites = fb.getGamesFromRequests(req.getParameter("request_ids"));
+				for(Invite i : invites) {										
 					i.setInvitedId(p.getFbId());
 					dao.ofy().put(i);
 				}

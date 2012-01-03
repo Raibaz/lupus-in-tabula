@@ -5,7 +5,8 @@ import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.appengine.repackaged.org.json.JSONString;
+import org.json.JSONString;
+
 
 public class AbsJsonable implements JSONString {
 	

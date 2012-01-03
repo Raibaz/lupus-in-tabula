@@ -7,7 +7,8 @@
 		<link href="/style.css" rel="stylesheet" type="text/css"/> 
 	</head>
 	<body>
-		In attesa di giocatori...non chiudere questa pagina!
+		In attesa di giocatori...non chiudere questa pagina!<br/>
+		Ricordati che per avere un'esperienza di gioco soddisfacente è necessario avere almeno otto giocatori connessi, per cui <a href="#" class="invite-friends">invita</a> subito dei tuoi amici!
 		
 		<div id="players">
 			<ul id="players-list">				
@@ -18,14 +19,14 @@
 		<% 
 			if(request.getParameter("is_owner") != null && request.getParameter("is_owner").equals("true")) {
 		%>
-			<a href="#" id="start_game">Comincia la partita!</a><br/>
-			<a href="#" id="archive_game">Elimina la partita!</a>
+			<a href="#" id="start_game">Comincia la partita</a><br/>
+			<a href="#" id="archive_game">Elimina la partita</a>
 		<%
 			}
 		%>
 		
 		<div id="invite">
-			<a href="#" id="invite-friends">Invita dei tuoi amici a questa partita</a>
+			<a href="#" id="invite-friends" class="invite-friends">Invita dei tuoi amici a questa partita</a>
 		</div>
 		
 		<div id="messages">&nbsp;</div>
@@ -79,7 +80,7 @@
 					});
 				});				
 				
-				$('#invite-friends').click(function() {
+				$('.invite-friends').click(function() {
 					FB.init({appId:'183863271686299', cookie:true,status:true, xfbml:true,frictionlessRequests:true});
      				FB.ui({ method: 'apprequests',message: 'Seleziona quali amici vuoi invitare. Attenzione: è preferibile invitare amici che sono già online.',data: '<%=request.getParameter("game_id")%>'});
 				});

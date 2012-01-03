@@ -9,12 +9,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.mortbay.log.Log;
+import org.json.JSONArray;
 
-import com.google.appengine.repackaged.org.json.JSONArray;
 import com.raibaz.lupus.dao.LupusDAO;
 import com.raibaz.lupus.game.Game;
 import com.raibaz.lupus.game.Invite;
+import com.raibaz.lupus.game.Player;
 
 public class GameListServlet extends HttpServlet {
 	private static final Logger log = Logger.getLogger("GameListServlet");
@@ -33,8 +33,9 @@ public class GameListServlet extends HttpServlet {
 		List<Game> games = dao.listWaitingGames();		
 		for(Invite i : invites) {
 			for(Game g : games) {
-				if(g.getId().equals(i.getGameId())) {					
-					g.setInvited(true);
+				if(g.getId().equals(i.getGameId())) {			
+					Player p = dao.ofy().find(Player.class, i.getInviterId());
+					g.setInviter(p);
 				}				
 			}
 		}

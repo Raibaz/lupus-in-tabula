@@ -1,5 +1,19 @@
+#welcome .avatar {
+	display: block;
+}
+
+.invite {
+	float: right;
+	width: 30%;
+}
+
+#gamelist {
+	list-style-type: none;
+}
+
 #gamelist .invited {
-	border: 1px solid red;
+	outline: yellow solid thin;
+	border: 1px solid yellow;
 }
 
 #players-list li {
@@ -36,6 +50,7 @@
 	width: 75%;
 	height: 100%;
 	float: left;	
+	list-style-type: none;
 }
 
 #chat-log {

@@ -8,12 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.google.appengine.repackaged.com.google.common.util.Base64;
 import com.google.appengine.repackaged.com.google.common.util.Base64DecoderException;
-import com.google.appengine.repackaged.org.json.JSONException;
-import com.google.appengine.repackaged.org.json.JSONObject;
-import com.raibaz.lupus.dao.LupusDAO;
-import com.raibaz.lupus.game.Game;
+import com.raibaz.lupus.game.Invite;
 import com.raibaz.lupus.game.Player;
 import com.restfb.DefaultFacebookClient;
 import com.restfb.Parameter;
@@ -49,19 +49,23 @@ public class FacebookAPI {
 		}
 	}
 	
-	public List<String> getGamesFromRequests(String requestIds) {
+	public List<Invite> getGamesFromRequests(String requestIds) {
 		DefaultFacebookClient client = new DefaultFacebookClient(accessToken);
-		ArrayList<String> ret = new ArrayList<String>();
-		LupusDAO dao = new LupusDAO();
+		ArrayList<Invite> ret = new ArrayList<Invite>();		
 		String[] split = requestIds.split(",");
 		
 		for(String s : split) {		
 			JsonObject requestJson = client.fetchObject(s, JsonObject.class);		
 			try {
 				String gameId = requestJson.getString("data");
-				if(gameId != null) {
-					ret.add(gameId);
+				String inviterId = requestJson.getJsonObject("from").getString("id");
+				if(gameId != null && inviterId != null) {
+					Invite i = new Invite();
+					i.setGameId(gameId);
+					i.setInviterId(inviterId);
+					ret.add(i);
 				}
+								
 				client.deleteObject(s);
 			} catch (JsonException jsone) {
 				//Do nothing
