@@ -4,11 +4,13 @@
 	<head>
 		<script type="text/javascript" src="https://www.google.com/jsapi?key=ABQIAAAArc-aBcMtas27GxefyJyUHhRL-CQUxo4cyKjOW-vmsVYovkcPkxQE2hJN1nGerTi9FsBBBwotb0LXSQ"></script>
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-		<script type="text/javascript" src="js/jquery.blockUI.js"></script>
+		<script type="text/javascript" src="/js/jquery.blockUI.js"></script>
+		<script type="text/javascript" src="/js/jquery.qtip.min.js"></script>
 		<script type="text/javascript" src="/_ah/channel/jsapi"></script>		
-		<script type="text/javascript" src="js/util.js?ver=1"></script>
-		<script type="text/javascript" src="js/play.js?ver=<%=new Date()%>"></script>
+		<script type="text/javascript" src="/js/util.js?ver=<%=new Date()%>"></script>
+		<script type="text/javascript" src="/js/play.js?ver=<%=new Date()%>"></script>
 		<link href="/css/style.css?ver=<%=new Date()%>" rel="stylesheet" type="text/css"/> 
+		<link href="/css/jquery.qtip.min.css" rel="stylesheet" type="text/css"/>  
 	</head>
 	<body>
 		<div id="play-main">
@@ -49,7 +51,7 @@
 					
 					$('.player-item').click(function() {						
 						if(current_state !== 'DEBATE') {
-							$('#players').block();							
+							$('#players').block().removeData('qtip');							
 							$.post('/vote', {"target_id": this.id, "game_id": game_id, "voter_id":myFbId});
 						}
 					});
@@ -104,7 +106,24 @@
 							if(data.msg === "VOTING_1") {								
 								chat('', "Inizia il primo round di nomination, il primo a votare è " + data.target.name);
 								if(myFbId == data.target.fbId) {
-									$('#players').unblock();
+									$('#players').unblock().qtip({
+										content: {
+											text: "Per votare per un giocatore o per indicarlo, è sufficiente cliccare sulla sua immagine"
+										}, style: {
+											classes: "ui-tooltip-jtools ui-tooltip-dark hint-tooltip",
+											height: "20%"
+										}, position:  {
+											my: "top right",
+											at: "top left",
+											target: $('#players-list')
+										}, show: {
+											ready: true,
+											event: false,
+											delay: 3000
+										}, hide: {
+											inactive: 3000
+										}
+									});
 									blockUnavailablePlayers();							
 								} else {
 									$('#players').block();

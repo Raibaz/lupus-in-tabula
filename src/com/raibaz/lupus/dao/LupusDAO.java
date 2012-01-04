@@ -70,7 +70,7 @@ public class LupusDAO extends DAOBase {
 	}
 	
 	public int archiveGamesOlderThan(Date treshold) {
-		List<Game> olderGames = ofy().query(Game.class).filter("creationDate < ", treshold).filter("state != ", GameState.ARCHIVED).list();
+		List<Game> olderGames = ofy().query(Game.class).filter("creationDate < ", treshold).list();
 		int ret = 0;
 		for(Game g : olderGames) {
 			if(g.getState() != GameState.ARCHIVED) {
