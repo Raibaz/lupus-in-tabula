@@ -8,7 +8,7 @@
 		<script type="text/javascript" src="/_ah/channel/jsapi"></script>		
 		<script type="text/javascript" src="js/util.js?ver=1"></script>
 		<script type="text/javascript" src="js/play.js?ver=<%=new Date()%>"></script>
-		<link href="/style.css?ver=<%=new Date()%>" rel="stylesheet" type="text/css"/> 
+		<link href="/css/style.css?ver=<%=new Date()%>" rel="stylesheet" type="text/css"/> 
 	</head>
 	<body>
 		<div id="play-main">

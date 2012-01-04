@@ -4,7 +4,7 @@
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 		<script type="text/javascript" src="/_ah/channel/jsapi"></script>
 		<script src="http://connect.facebook.net/en_US/all.js"></script>
-		<link href="/style.css" rel="stylesheet" type="text/css"/> 
+		<link href="/css/style.css" rel="stylesheet" type="text/css"/> 
 	</head>
 	<body>
 		In attesa di giocatori...non chiudere questa pagina!<br/>

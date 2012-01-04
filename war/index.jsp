@@ -21,9 +21,11 @@
 
 <html>
 	<head>
-		<link href="/style.css?ver=<%=new Date()%>" rel="stylesheet" type="text/css"/> 
+		<link href="/css/style.css?ver=<%=new Date()%>" rel="stylesheet" type="text/css"/>
+		<link href="/css/jquery.qtip.min.css" rel="stylesheet" type="text/css"/>  
 		<script type="text/javascript" src="https://www.google.com/jsapi?key=ABQIAAAArc-aBcMtas27GxefyJyUHhRL-CQUxo4cyKjOW-vmsVYovkcPkxQE2hJN1nGerTi9FsBBBwotb0LXSQ"></script>
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+		<script type="text/javascript" src="/js/jquery.qtip.min.js"></script>
 		<script type="text/javascript" src="/_ah/channel/jsapi"></script>		
 		<script type="text/javascript">
 			if(<%=request.getParameter("need_authentication")%> == true) {				
@@ -38,7 +40,7 @@
 		<script type="text/javascript">
 			$(document).ready(function() {				
 				updateGameList();
-				setInterval("updateGameList()", 2000);						
+				setInterval("updateGameList()", 2000);								
 			});	
 			
 			function updateGameList() {
@@ -54,23 +56,41 @@
 						var invite = "";
 						if(game.inviter) {
 							li_class = "invited";
-							invite = '<span class="invite">Invitato da ' + game.inviter.name + '</span>';
-						}	
-						li_class = "invited";
-						invite = '<span class="invite">Invitato da sabadnbasd</span>';												
-						$('#gamelist').append('<li id="' + game.id + '" class="' + li_class + '">' + game.name + ' creata da ' + game.owner.name + ' - <a href="#" class="join_link">Unisciti</a>' + invite + '</li>');						
-					}
+							invite = 'Invitato da ' + game.inviter.name;
+						}																		
+						$('#gamelist').append('<li id="' + game.id + '" class="' + li_class + '">' + game.name + ' creata da ' + game.owner.name + ' - <a href="#" class="join_link" title="'+invite+'">Unisciti</a></li>');											
+					}					
 					$('#gamelist li a').click(function() {						
 						game_id = $(this).parent().attr("id");
 						$.post('/join_game', {"game": game_id, "player_id": '<%=currentPlayer.getFbId()%>'}, function(data) {
 							resp = JSON.parse(data);
 							window.location.replace("/waiting_game.jsp?game_id=" + resp.id + "&channel_token=" + resp.channelToken + "&player_id="+"<%=currentPlayer.getFbId()%>");
 						});
-					});
-					
+					}).removeData('qtip').qtip({
+						overwrite: false,
+						position: {
+							my: "left center",
+							at: "right center",
+							target: $('#gamelist li a')
+						},
+						show: {							
+							ready: true,
+							solo: true,
+							effect: function() {
+								$(this).fadeIn("slow");
+							}												
+						}, hide: {
+							effect: function() {
+								$(this).fadeOut("slow");
+							}
+						},
+						style : {
+							classes: "ui-tooltip-jtools ui-tooltip-dark invite-tooltip"
+						}				
+					});							
 				});
 			}		
-						
+												
 			$('#create_game').click(function() {			   
 				$('#create_game').attr('disabled', 'true');
 				$.post('/create_game', {player_id:'<%=currentPlayer.getFbId()%>'}, function(data) {
