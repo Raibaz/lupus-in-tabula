@@ -1,0 +1,13 @@
+- DONE A document.ready di play.jsp chiedo a una servlet (nuova) la lista di utenti che hanno il mio ruolo e che ruolo è
+- DONE Rendere getnextvoterinnight (che fa lupo-veggente-medium-blablabla) dipendente dalla gameconfiguration
+- DONE Nel js locale tengo una lista di oggetti player con un po' di info (tipo il ruolo quando l'ho scoperto, se è vivo, quanti voti ha, etc.)
+- DONE BUG: secondo giorno, primo giro di nomination tutto ok, al secondo giro di nomination vota il primo e il giro finisce subito: probabile manchi il reset di hasVoted? da testare anche la partenza da lastDead +1
+- DONE Aggiungere uno stato per le arringhe tra voting_1 e voting_2
+- (low) reimplementare waiting_game con un polling normale anzichè coi channel
+- background task per archiviare le partite appese e più vecchie di tot (aggiungendo uno stato ARCHIVED da usare anche per le partite finite e la data di creazione della partita)
+- gestire meglio i voti per quando i lupi non sono unanimi, lato client
+- (low) piantar dentro json-lib per eliminare gli errori fastidiosi
+- reimplementare il timer delle arringhe lato server anzichè lato client
+- (high) invita amici alla partita
+- durante la notte i lupi possono chattare solo tra di loro
+- (high) pooling dei channel
