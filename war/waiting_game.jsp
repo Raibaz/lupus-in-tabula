@@ -1,3 +1,4 @@
+<!doctype html>
 <html>
 	<head>
 		<script type="text/javascript" src="https://www.google.com/jsapi?key=ABQIAAAArc-aBcMtas27GxefyJyUHhRL-CQUxo4cyKjOW-vmsVYovkcPkxQE2hJN1nGerTi9FsBBBwotb0LXSQ"></script>
@@ -5,6 +6,7 @@
 		<script type="text/javascript" src="/_ah/channel/jsapi"></script>
 		<script src="http://connect.facebook.net/en_US/all.js"></script>
 		<link href="/css/style.css" rel="stylesheet" type="text/css"/> 
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 	</head>
 	<body>
 		In attesa di giocatori...non chiudere questa pagina!<br/>
@@ -37,8 +39,8 @@
 		<script type="text/javascript">
 			$(document).ready(function() {
 				
-				$.post('/get_game', {"game_id":"<%=request.getParameter("game_id")%>"}, function(data) {
-					resp = JSON.parse(data);
+				$.post('/get_game?' + new Date().getTime(), {"game_id":"<%=request.getParameter("game_id")%>"}, function(data) {
+					resp = data;
 					for(i in resp.players) {						
 						$('#players-list').append('<li id="' + resp.players[i].fbId + '"><img src="' + resp.players[i].pictureUrl + '"/>' + resp.players[i].name + ' </li>');
 					}
@@ -48,11 +50,11 @@
 					}
 					fadeItem();
 					
-				});				
+				}, "json");				
 				
 				channel = new goog.appengine.Channel('<%=request.getParameter("channel_token")%>');
 				socket = channel.open();				
-				socket.onmessage = function(message) {					
+				socket.onmessage = function(message) {								
 					data = JSON.parse(message.data);
 					if(data.type == "JOIN") {
 						$('#players-list').append('<li id="' + data.player.fbId + '"><img src="' + data.player.pictureUrl + '"/>' + data.player.name + ' </li>');
@@ -60,8 +62,7 @@
 					} else if(data.type == "GAMESTATE") {
 						if(data.msg.indexOf("start__") == 0) {																			
 							url = "/play.jsp?player_id=" + data.target.fbId + "&game_id=" + data.gameId + '&channel_token=' + data.msg.substring("start__".length);
-							console.info(url);
-							socket.close();
+							console.info(url);							
 							window.location.replace(url);						
 						} else if(data.msg == "ARCHIVED") {
 							$('#messages').html("La partita è stata cancellata, verrete rediretti alla pagina iniziale tra 5 secondi...");
@@ -71,11 +72,11 @@
 				};	
 				
 				$('#start_game').click(function() {
-					$.post('/start_game', {"game_id": "<%=request.getParameter("game_id")%>"});
+					$.post('/start_game?' + new Date().getTime(), {"game_id": "<%=request.getParameter("game_id")%>"});
 				});
 							
 				$('#archive_game').click(function() {
-					$.post('/archive-game', {"game_id": "<%=request.getParameter("game_id")%>","player_id":"<%=request.getParameter("player_id")%>"}, function(data) {
+					$.post('/archive-game?' + new Date().getTime(), {"game_id": "<%=request.getParameter("game_id")%>","player_id":"<%=request.getParameter("player_id")%>"}, function(data) {
 						window.location.replace("https://apps.facebook.com/lupusintabula");
 					});
 				});				

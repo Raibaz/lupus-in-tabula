@@ -8,4 +8,7 @@
 		<property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
 	</system-properties>
 	<ssl-enabled>true</ssl-enabled>
+	<inbound-services>
+    	<service>channel_presence</service>
+  	</inbound-services>
 </appengine-web-app>

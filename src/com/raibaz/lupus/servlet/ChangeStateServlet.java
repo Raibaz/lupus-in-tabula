@@ -39,7 +39,7 @@ public class ChangeStateServlet extends HttpServlet {
 			LupusMessage msg = new LupusMessage(MessageType.GAMESTATE, g.getOwner());
 			msg.setMsg(stateStr);
 			msg.setTarget(engine.determineNextVoterInRound1(g.getLastDead()));
-			msg.broadcastToPlayingPlayers(g);
+			msg.broadcastToPlayers(g);
 			dao.ofy().put(g);
 		} else if(state == GameState.DEFENSE) {
 			Player currentNominated = dao.ofy().find(Player.class, playerId);
@@ -65,13 +65,13 @@ public class ChangeStateServlet extends HttpServlet {
 				LupusMessage msg = new LupusMessage(MessageType.GAMESTATE, g.getOwner());
 				msg.setMsg(GameState.VOTING_2.toString());
 				msg.setTarget(engine.determineNextVoterInRound2(g.getLastDead()));
-				msg.broadcastToPlayingPlayers(g);
+				msg.broadcastToPlayers(g);
 				dao.ofy().put(g);
 			} else {
 				LupusMessage stateMsg = new LupusMessage(MessageType.GAMESTATE, null);
 				stateMsg.setMsg(GameState.DEFENSE.toString());				
 				stateMsg.setTarget(nextNominated);
-				stateMsg.broadcastToPlayingPlayers(g);
+				stateMsg.broadcastToPlayers(g);
 			}
 		}
 	}

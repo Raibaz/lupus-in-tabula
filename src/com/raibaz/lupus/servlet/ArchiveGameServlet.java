@@ -37,7 +37,6 @@ public class ArchiveGameServlet extends HttpServlet {
 		
 		LupusMessage archivedMsg = new LupusMessage(MessageType.GAMESTATE, p);
 		archivedMsg.setMsg(GameState.ARCHIVED.toString());
-		archivedMsg.broadcastToPlayingPlayers(g);
-		archivedMsg.broadcastToWaitingPlayers(g);
+		archivedMsg.broadcastToPlayers(g);		
 	}
 }

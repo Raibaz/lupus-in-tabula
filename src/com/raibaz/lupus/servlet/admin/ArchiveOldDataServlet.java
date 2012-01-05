@@ -12,10 +12,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.raibaz.lupus.dao.LupusDAO;
 
-public class ArchiveOldGamesServlet extends HttpServlet {
+public class ArchiveOldDataServlet extends HttpServlet {
 
 	private int WAITING_GAMES_TRESHOLD = 1000 * 60 * 60 * 4;
 	private int PLAYING_GAMES_TRESHOLD = 1000 * 60 * 60 * 24;
+	private int PRESENCE_CONNECTION_TRESHOLD = 1;//000 * 60 * 60 * 6;
 	
 	private static final Logger log = Logger.getLogger("ArchiveOldGamesServlet");
 	
@@ -33,9 +34,14 @@ public class ArchiveOldGamesServlet extends HttpServlet {
 		
 		Calendar startedCal = Calendar.getInstance();
 		startedCal.add(Calendar.MILLISECOND, PLAYING_GAMES_TRESHOLD * -1);		
-		int started = dao.archiveGamesOlderThan(new Date(PLAYING_GAMES_TRESHOLD));
+		int started = dao.archiveGamesOlderThan(startedCal.getTime());
 		
-		log.info("Archived " + started + " started games");				
+		log.info("Archived " + started + " started games");			
+		
+		Calendar disconnectedCal = Calendar.getInstance();
+		disconnectedCal.add(Calendar.MILLISECOND, PRESENCE_CONNECTION_TRESHOLD * -1);
+		int disconnected = dao.disconnectPresencesOlderthan(disconnectedCal.getTime());
+		log.info("Disconnected " + disconnected + " pending presences");
 	}
 
 }

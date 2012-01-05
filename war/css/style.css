@@ -2,6 +2,10 @@
 	display: block;
 }
 
+#gamelist .game_description {
+	margin-left: 15px;
+}
+
 .invite {
 	float: right;
 	width: 30%;

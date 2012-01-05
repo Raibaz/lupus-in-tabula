@@ -1,7 +1,8 @@
 <%@ page import="java.util.Date"%>
-
+<!doctype html>
 <html>
 	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 		<script type="text/javascript" src="https://www.google.com/jsapi?key=ABQIAAAArc-aBcMtas27GxefyJyUHhRL-CQUxo4cyKjOW-vmsVYovkcPkxQE2hJN1nGerTi9FsBBBwotb0LXSQ"></script>
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 		<script type="text/javascript" src="/js/jquery.blockUI.js"></script>

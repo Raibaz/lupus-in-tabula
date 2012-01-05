@@ -97,7 +97,7 @@ public class VoteServlet extends HttpServlet {
 		if(g.getState() == GameState.NIGHT) {
 			msg.broadcastToPlayersByRole(g, voter.getRole());
 		} else{
-			msg.broadcastToPlayingPlayers(g);
+			msg.broadcastToPlayers(g);
 		}
 		
 				
@@ -113,7 +113,7 @@ public class VoteServlet extends HttpServlet {
 	private void notifyNextCharacter(Game g, Player nextVoter) {
 		LupusMessage stateMsg = new LupusMessage(MessageType.GAMESTATE, null);			
 		stateMsg.setMsg(nextVoter.getRole().toString());
-		stateMsg.broadcastToPlayingPlayers(g);
+		stateMsg.broadcastToPlayers(g);
 		
 		if(nextVoter.getRole() != PlayerRole.MEDIUM) {
 			LupusMessage nextMsg = new LupusMessage(MessageType.NIGHTVOTE, null);
@@ -135,7 +135,7 @@ public class VoteServlet extends HttpServlet {
 			stateMsg.setNominated(votedPlayers);
 			stateMsg.setTarget(votedPlayers.get(0));
 			//stateMsg.setTarget(engine.determineNextVoterInRound2(g.getLastDead()));
-			stateMsg.broadcastToPlayingPlayers(g);
+			stateMsg.broadcastToPlayers(g);
 		} else if(g.getState() == GameState.VOTING_2) {
 			g.setState(GameState.NIGHT);
 			Player deadPlayer = engine.computeDeadPlayerInRound2();
@@ -151,7 +151,7 @@ public class VoteServlet extends HttpServlet {
 				if(log.isLoggable(Level.FINE)) {
 					log.fine("About to send message stating that after a vote by " + voter.getName() + ", " + deadPlayer.getName() + " died.");
 				}
-				stateMsg.broadcastToPlayingPlayers(g);
+				stateMsg.broadcastToPlayers(g);
 				
 				LupusMessage wolfMessage = new LupusMessage(MessageType.NIGHTVOTE, null);
 				wolfMessage.setMsg(PlayerRole.WOLF.toString());
@@ -162,7 +162,7 @@ public class VoteServlet extends HttpServlet {
 					g.setState(GameState.ENDED);
 					LupusMessage endMsg = new LupusMessage(MessageType.GAMESTATE, voter);
 					endMsg.setMsg(GameState.ENDED.toString());
-					endMsg.broadcastToPlayingPlayers(g);						
+					endMsg.broadcastToPlayers(g);						
 				} 					
 								
 			}
@@ -178,7 +178,7 @@ public class VoteServlet extends HttpServlet {
 			LupusMessage dayMessage = new LupusMessage(MessageType.GAMESTATE, null);
 			dayMessage.setMsg(GameState.DEBATE.toString());
 			dayMessage.setTarget(deadPlayer);
-			dayMessage.broadcastToPlayingPlayers(g);				
+			dayMessage.broadcastToPlayers(g);				
 		}
 	}
 }

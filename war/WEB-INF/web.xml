@@ -13,14 +13,6 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<url-pattern>/begin</url-pattern>
 	</servlet-mapping>
 	<servlet>
-		<servlet-name>SendMessage</servlet-name>
-		<servlet-class>com.raibaz.lupus.SendMessageServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>SendMessage</servlet-name>
-		<url-pattern>/sendMessage</url-pattern>
-	</servlet-mapping>
-	<servlet>
 		<servlet-name>CreateGame</servlet-name>
 		<servlet-class>com.raibaz.lupus.servlet.CreateGameServlet</servlet-class>
 	</servlet>
@@ -102,12 +94,28 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 	</servlet-mapping>	
 	<servlet>
 		<servlet-name>ArchiveOldGames</servlet-name>
-		<servlet-class>com.raibaz.lupus.servlet.admin.ArchiveOldGamesServlet</servlet-class>
+		<servlet-class>com.raibaz.lupus.servlet.admin.ArchiveOldDataServlet</servlet-class>
 	</servlet>	
 	<servlet-mapping>
 		<servlet-name>ArchiveOldGames</servlet-name>
 		<url-pattern>/admin/archive_old</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>ChannelDisconnection</servlet-name>
+		<servlet-class>com.raibaz.lupus.servlet.ChannelDisconnectionServlet</servlet-class>
+	</servlet>	
+	<servlet-mapping>
+		<servlet-name>ChannelDisconnection</servlet-name>
+		<url-pattern>/_ah/channel/disconnected/</url-pattern>
 	</servlet-mapping>	
+	<servlet>
+		<servlet-name>ChannelConnection</servlet-name>
+		<servlet-class>com.raibaz.lupus.servlet.ChannelConnectionServlet</servlet-class>
+	</servlet>	
+	<servlet-mapping>
+		<servlet-name>ChannelConnection</servlet-name>
+		<url-pattern>/_ah/channel/connected/</url-pattern>
+	</servlet-mapping>		
 	<welcome-file-list>
 		<welcome-file>index.jsp</welcome-file>
 	</welcome-file-list>

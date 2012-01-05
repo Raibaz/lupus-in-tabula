@@ -20,7 +20,7 @@ public class GameEngine {
 	
 	public void resetAllPlayers() {
 		LupusDAO dao = new LupusDAO();
-		for(Player p : g.getPlayers()) {
+		for(Player p : g.getPlayers(true)) {
 			p.setAlive(true);
 			p.setNominated(false);
 			p.setHasVoted(false);

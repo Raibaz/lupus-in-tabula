@@ -84,26 +84,18 @@ public class LupusMessage extends AbsJsonable {
 		this.nominated = nominated;
 	}
 
-	public void broadcastToPlayingPlayers(Game g) {
+	public void broadcastToPlayers(Game g) {
 		ChannelService chanServ = ChannelServiceFactory.getChannelService();
-		for(Player p : g.getPlayers()) {
-			chanServ.sendMessage(new ChannelMessage(p.getFbId() + "-playing", this.toJSONString()));			
+		for(Player p : g.getPlayers(true)) {						
+			chanServ.sendMessage(new ChannelMessage(p.getChannelClientId(), this.toJSONString()));			
 		}
 	}
-	
-	public void broadcastToWaitingPlayers(Game g) {
-		ChannelService chanServ = ChannelServiceFactory.getChannelService();
-		for(Player p : g.getPlayers()) {
-			chanServ.sendMessage(new ChannelMessage(p.getFbId() + "-waiting", this.toJSONString()));			
-		}
-	}
-	
 	
 	public void broadcastToPlayersByRole(Game g, PlayerRole role) {
 		ChannelService chanServ = ChannelServiceFactory.getChannelService();
-		for(Player p : g.getPlayers()) {
+		for(Player p : g.getPlayers(true)) {
 			if(p.getRole() == role) {
-				chanServ.sendMessage(new ChannelMessage(p.getFbId() + "-playing", this.toJSONString()));
+				chanServ.sendMessage(new ChannelMessage(p.getChannelClientId(), this.toJSONString()));
 			}
 		}
 	}

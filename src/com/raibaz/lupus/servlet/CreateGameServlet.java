@@ -12,6 +12,8 @@ import org.json.JSONObject;
 
 import com.google.appengine.api.channel.ChannelService;
 import com.google.appengine.api.channel.ChannelServiceFactory;
+import com.raibaz.lupus.channel.ChannelPool;
+import com.raibaz.lupus.channel.LupusPresence;
 import com.raibaz.lupus.dao.LupusDAO;
 import com.raibaz.lupus.game.Game;
 import com.raibaz.lupus.game.Player;
@@ -35,7 +37,11 @@ public class CreateGameServlet extends HttpServlet {
 		g.setCreationDate(new Date());
 		
 		ChannelService chanServ = ChannelServiceFactory.getChannelService();
-		String chanToken = chanServ.createChannel(owner.getFbId() + "-waiting");
+		//String chanToken = chanServ.createChannel(owner.getFbId() + "-waiting");
+		LupusPresence channelPresence = ChannelPool.getPresence();
+		String chanToken = channelPresence.getChannelToken();
+		owner.setChannelClientId(channelPresence.getClientId());
+		dao.ofy().put(owner);
 		
 		g.setOwner(owner);
 		g.getPlayers().add(owner);

@@ -11,6 +11,8 @@ public class Player extends AbsJsonable {
 	private String fbToken;
 	private PlayerRole role;
 	
+	private String channelClientId;
+	
 	private int votes;
 	private boolean hasVoted = false;
 	private boolean nominated = false;
@@ -95,5 +97,14 @@ public class Player extends AbsJsonable {
 	}
 	public void setOwled(boolean owled) {
 		this.owled = owled;
-	}	
+	}
+
+	@JsonVisibility(hide=true)
+	public String getChannelClientId() {
+		return channelClientId;
+	}
+
+	public void setChannelClientId(String channelClientId) {
+		this.channelClientId = channelClientId;
+	}
 }

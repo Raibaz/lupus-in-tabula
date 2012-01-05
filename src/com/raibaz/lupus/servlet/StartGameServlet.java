@@ -11,6 +11,8 @@ import com.google.appengine.api.channel.ChannelService;
 import com.google.appengine.api.channel.ChannelServiceFactory;
 import com.raibaz.lupus.LupusMessage;
 import com.raibaz.lupus.LupusMessage.MessageType;
+import com.raibaz.lupus.channel.ChannelPool;
+import com.raibaz.lupus.channel.LupusPresence;
 import com.raibaz.lupus.dao.LupusDAO;
 import com.raibaz.lupus.game.Game;
 import com.raibaz.lupus.game.GameEngine;
@@ -34,11 +36,14 @@ public class StartGameServlet extends HttpServlet {
 		LupusMessage msg = new LupusMessage(MessageType.GAMESTATE, g.getOwner());		
 		msg.setGameId(g.getId());
 		
-		for(Player p : g.getPlayers()) {
-			String newChannelToken = chanServ.createChannel(p.getFbId() + "-playing");		
+		for(Player p : g.getPlayers(true)) {
+			LupusPresence presence = ChannelPool.getPresence();
+			String newChannelToken = presence.getChannelToken();		
 			msg.setTarget(p);
 			msg.setMsg("start__" + newChannelToken);
-			chanServ.sendMessage(new ChannelMessage(p.getFbId() + "-waiting", msg.toJSONString()));
+			chanServ.sendMessage(new ChannelMessage(p.getChannelClientId(), msg.toJSONString()));
+			p.setChannelClientId(presence.getClientId());
+			dao.ofy().put(p);
 		}		
 	}
 

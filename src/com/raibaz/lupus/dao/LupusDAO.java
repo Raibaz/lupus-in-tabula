@@ -1,11 +1,12 @@
 package com.raibaz.lupus.dao;
 
+import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.util.DAOBase;
+import com.raibaz.lupus.channel.LupusPresence;
 import com.raibaz.lupus.game.Game;
 import com.raibaz.lupus.game.GameState;
 import com.raibaz.lupus.game.Invite;
@@ -17,6 +18,7 @@ public class LupusDAO extends DAOBase {
 		ObjectifyService.register(Player.class);
 		ObjectifyService.register(Game.class);
 		ObjectifyService.register(Invite.class);
+		ObjectifyService.register(LupusPresence.class);
 	}
 	
 	public Player getPlayer(String fbId) {
@@ -84,6 +86,25 @@ public class LupusDAO extends DAOBase {
 			}
 		}
 		return ret;
+	}
+	
+	public LupusPresence getFirstAvailablePresence() {
+		Calendar treshCal = Calendar.getInstance();
+		treshCal.add(Calendar.MILLISECOND, 1000 * 60 * 15 * -1);
+		List<LupusPresence> presences = ofy().query(LupusPresence.class).filter("connected", Boolean.FALSE).filter("lastSeen <", treshCal.getTime()).order("lastSeen").limit(1).list();
+		if(presences.size() == 1) {
+			return presences.get(0);
+		} else {
+			return null;
+		}
+	}
+	
+	public int disconnectPresencesOlderthan(Date treshold) {
+		List<LupusPresence> presences = ofy().query(LupusPresence.class).filter("connected", Boolean.TRUE).filter("lastSeen <", treshold).list();
+		for(LupusPresence lp : presences) {			
+			ofy().delete(lp);
+		}
+		return presences.size();
 	}
 	
 }

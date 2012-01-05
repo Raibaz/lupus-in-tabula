@@ -32,6 +32,6 @@ public class ChatServlet extends HttpServlet {
 		
 		LupusMessage message = new LupusMessage(MessageType.CHAT, p);
 		message.setMsg(msg);
-		message.broadcastToPlayingPlayers(g);					
+		message.broadcastToPlayers(g);					
 	}
 }
