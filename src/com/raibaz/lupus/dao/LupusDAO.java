@@ -91,7 +91,7 @@ public class LupusDAO extends DAOBase {
 	public LupusPresence getFirstAvailablePresence() {
 		Calendar treshCal = Calendar.getInstance();
 		treshCal.add(Calendar.MILLISECOND, 1000 * 60 * 15 * -1);
-		List<LupusPresence> presences = ofy().query(LupusPresence.class).filter("connected", Boolean.FALSE).filter("lastSeen <", treshCal.getTime()).order("lastSeen").limit(1).list();
+		List<LupusPresence> presences = ofy().query(LupusPresence.class).filter("assigned", Boolean.FALSE).filter("lastSeen <", treshCal.getTime()).order("lastSeen").limit(1).list();
 		if(presences.size() == 1) {
 			return presences.get(0);
 		} else {
@@ -104,7 +104,16 @@ public class LupusDAO extends DAOBase {
 		for(LupusPresence lp : presences) {			
 			ofy().delete(lp);
 		}
-		return presences.size();
+		
+		int deleted = presences.size();
+		
+		presences = ofy().query(LupusPresence.class).filter("connected", Boolean.FALSE).filter("assigned", Boolean.TRUE).filter("lastSeen <", treshold).list();
+		for(LupusPresence lp : presences) {
+			lp.setAssigned(false);
+			ofy().put(lp);
+		}
+		
+		return presences.size() + deleted;
 	}
 	
 }

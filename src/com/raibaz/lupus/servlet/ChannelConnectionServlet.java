@@ -25,7 +25,7 @@ public class ChannelConnectionServlet extends HttpServlet {
 		
 		log.info("Received connection from channel with clientId = " + presence.clientId());
 		
-		ChannelPool.updatePresence(presence.clientId(), true);
+		ChannelPool.updatePresence(presence.clientId(), true, true);
 		
 		super.service(req, resp);
 	}	

@@ -52,17 +52,16 @@
 					
 				}, "json");				
 				
-				channel = new goog.appengine.Channel('<%=request.getParameter("channel_token")%>');
-				socket = channel.open();				
-				socket.onmessage = function(message) {								
-					data = JSON.parse(message.data);
+				channel = new goog.appengine.Channel('<%=request.getParameter("channel_token")%>');				
+				socket = channel.open();								
+				socket.onmessage = function(message) {											
+					data = JSON.parse(message.data);					
 					if(data.type == "JOIN") {
 						$('#players-list').append('<li id="' + data.player.fbId + '"><img src="' + data.player.pictureUrl + '"/>' + data.player.name + ' </li>');
 						$('#'+data.player.fbId).fadeIn();
 					} else if(data.type == "GAMESTATE") {
 						if(data.msg.indexOf("start__") == 0) {																			
-							url = "/play.jsp?player_id=" + data.target.fbId + "&game_id=" + data.gameId + '&channel_token=' + data.msg.substring("start__".length);
-							console.info(url);							
+							url = "/play.jsp?player_id=" + data.target.fbId + "&game_id=" + data.gameId + '&channel_token=' + data.msg.substring("start__".length);													
 							window.location.replace(url);						
 						} else if(data.msg == "ARCHIVED") {
 							$('#messages').html("La partita è stata cancellata, verrete rediretti alla pagina iniziale tra 5 secondi...");

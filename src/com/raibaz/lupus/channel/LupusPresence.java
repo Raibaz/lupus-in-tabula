@@ -13,6 +13,7 @@ public class LupusPresence {
 	private String channelToken;
 	
 	private boolean connected;
+	private boolean assigned;
 	private Date lastSeen;
 	
 	@PrePersist
@@ -46,5 +47,10 @@ public class LupusPresence {
 	public void setLastSeen(Date lastSeen) {
 		this.lastSeen = lastSeen;
 	}
-
+	public boolean isAssigned() {
+		return assigned;
+	}
+	public void setAssigned(boolean assigned) {
+		this.assigned = assigned;
+	}
 }

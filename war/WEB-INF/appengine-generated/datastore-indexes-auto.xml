@@ -1,10 +1,10 @@
-<!-- Indices written at Thu, 5 Jan 2012 10:11:40 UTC -->
+<!-- Indices written at Mon, 9 Jan 2012 16:59:42 UTC -->
 
 <datastore-indexes>
 
-    <!-- Used 16 times in query history -->
+    <!-- Used 40 times in query history -->
     <datastore-index kind="LupusPresence" ancestor="false" source="auto">
-        <property name="connected" direction="asc"/>
+        <property name="assigned" direction="asc"/>
         <property name="lastSeen" direction="asc"/>
     </datastore-index>
 

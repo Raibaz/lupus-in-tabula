@@ -53,7 +53,27 @@ public class ChangeStateServlet extends HttpServlet {
 					break;
 				}
 			}	
-			for(int i = currentNominatedIndex+1; i < players.size(); i++) {
+			int lastDeadIndex = 0;
+			String lastDeadId = "";
+			if(g.getLastDead() != null) {
+				lastDeadId = g.getLastDead().getFbId();
+			}			
+			for(int i = 0; i < players.size(); i++) {
+				if(players.get(i).getFbId().equals(lastDeadId)) {
+					lastDeadIndex = i;
+					break;
+				}
+			}
+			for(int i = currentNominatedIndex+1; i != currentNominatedIndex; i++) {
+				
+				if(i == players.size()) {
+					i = 0;
+				}
+				
+				if(i == lastDeadIndex) {
+					break;
+				}
+				
 				Player p = players.get(i);
 				if(p.isNominated()) {
 					nextNominated = p;

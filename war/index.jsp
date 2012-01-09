@@ -89,8 +89,7 @@
 			$('#create_game').click(function() {			   
 				$('#create_game').attr('disabled', 'true');
 				$.post('/create_game?'+new Date().getTime(), {player_id:'<%=currentPlayer.getFbId()%>'}, function(data) {
-					resp = data;				
-					console.info(resp);
+					resp = data;									
 					url = "/waiting_game.jsp?is_owner=true&game_id=" + resp.id + "&channel_token=" + resp.channelToken + "&player_id="+"<%=currentPlayer.getFbId()%>";					
 					window.location.replace(url);										
 				}, "json");

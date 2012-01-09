@@ -236,7 +236,7 @@ public class GameEngine {
 			}
 			maxVotes--;
 			//TODO l'1 è temporary, il valore giusto è 2
-		} while(ret.size() < 1 || maxVotes > 0);
+		} while(ret.size() < 2 || maxVotes > 0);
 					
 		return ret;
 	}

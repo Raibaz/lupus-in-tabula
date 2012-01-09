@@ -30,6 +30,8 @@ public class ChatServlet extends HttpServlet {
 			return;
 		}
 		
+		msg = msg.replace("\"", "&quot;").replace("<", "&lt;").replace(">", "&gt;");
+		
 		LupusMessage message = new LupusMessage(MessageType.CHAT, p);
 		message.setMsg(msg);
 		message.broadcastToPlayers(g);					

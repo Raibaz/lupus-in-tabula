@@ -26,7 +26,7 @@ public class ChannelDisconnectionServlet extends HttpServlet {
 		
 		log.info("Detected disconnection from client with clientId = " + presence.clientId());
 		
-		ChannelPool.updatePresence(presence.clientId(), true);
+		ChannelPool.updatePresence(presence.clientId(), false, false);
 		
 		super.service(req, resp);
 	}

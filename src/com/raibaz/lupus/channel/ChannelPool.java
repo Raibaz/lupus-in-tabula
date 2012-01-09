@@ -19,20 +19,22 @@ public class ChannelPool {
 			presence = new LupusPresence();
 			presence.setClientId("" + new Date().getTime());
 			ChannelService chanServ = ChannelServiceFactory.getChannelService();
-			presence.setChannelToken(chanServ.createChannel(presence.getClientId()));
-			dao.ofy().put(presence);
+			presence.setChannelToken(chanServ.createChannel(presence.getClientId()));			
 		} else {
 			log.info("Recycling presence with clientId = " + presence.getClientId());
 		}
-				
+		
+		presence.setAssigned(true);
+		dao.ofy().put(presence);		
 		return presence;
 	}
 	
-	public static void updatePresence(String clientId, boolean status) {
+	public static void updatePresence(String clientId, boolean connected, boolean assigned) {
 		LupusDAO dao = new LupusDAO();
 		LupusPresence presence = dao.ofy().find(LupusPresence.class, clientId);
 		if(presence != null) {
-			presence.setConnected(status);
+			presence.setConnected(connected);
+			presence.setAssigned(assigned);
 			dao.ofy().put(presence);
 		}
 	}
